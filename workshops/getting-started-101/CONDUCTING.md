@@ -1,9 +1,7 @@
 # How to Conduct This Workshop
 
-## 🎬 Recorded Tutorials
-| Link | Instructor |
-| ---- | ---------- |
-| [<img src="../../.docs/youtube-icon.png" alt="youtube" width="20" align="center"/>](https://github.com/solana-developers) | [Joe Caulfield](https://twitter.com/realbuffalojoe) |
-| [<img src="../../.docs/youtube-icon.png" alt="youtube" width="20" align="center"/>](https://github.com/solana-developers) | [Joe Caulfield](https://twitter.com/realbuffalojoe) |
+### [<img src="../../.docs/youtube-icon.png" alt="youtube" width="20" align="center"/> Video Tutorial](https://github.com/solana-developers)
 
-## 🎤 Conduct
+### [<img src="../../.docs/slides-icon.svg" alt="slides" width="20" align="center"/> Presentation Slides](https://github.com/solana-developers)
+
+### 📋 Step-By-Step Tutorial:
