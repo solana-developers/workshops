@@ -33,7 +33,7 @@ Please see [CONTRIBUTING](./CONTRIBUTING.md) for instructions on contributing ne
 
 | Workshop | Description | Author |
 | -------- | ----------- | ------ |
-| Getting Started with Solana 101 | A non-technical presentation on Solana basics. | Colin Ogoo |
+| [Getting Started with Solana 101](./workshops/getting-started-101) | A non-technical presentation on Solana basics. | Colin Ogoo |
 | Solana for Beginners Crash Course | A crash course for beginners. Covers basics such as transactions, accounts, tokens, and a HelloWorld smart contract (program). | Joe Caulfield |
 | Deep Dive into Writing Solana Programs | An extensive look at writing Solana Programs in Rust, with a preview of different frameworks like Anchor and Seahorse. | Joe Caulfield |
 | NFT Minter | A simple web page for uploading an image and minting it into an NFT. | Joe Caulfield |
