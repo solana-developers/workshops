@@ -22,9 +22,9 @@ src="./.docs/metacamp.jpeg"
 height="100"
 width="150"
 /> 
-   
-Browse all of the code and learn all about Solana development!   
-   
-Just take a look at the 📗 **Learning** section in each of the README's to start learning.   
-   
-Interested in conducting one of these workshops? Check out 🧰 **How to Host This Workshop** in the README's.
+
+---
+
+* `README.md` : Learnings from the workshop
+* `CONDUCTING.md` : How to conduct this particular workshop
+
