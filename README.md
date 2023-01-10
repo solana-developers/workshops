@@ -25,6 +25,7 @@ width="150"
 
 ---
 
+Inside each workshop's repository (inside `workshops/`):
 * `README.md` : Learnings from the workshop
 * `CONDUCTING.md` : How to conduct this particular workshop
 
