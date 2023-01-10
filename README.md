@@ -25,7 +25,7 @@ width="150"
 
 ---
 
-### 🚧 This repository is currently under construction 🚧
+### ✏️ Contributing
 
 Please see [CONTRIBUTING](./CONTRIBUTING.md) for instructions on contributing new workshops or modifying existing ones.
 
