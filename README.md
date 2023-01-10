@@ -1,0 +1,2 @@
+# workshops
+Solana development workshops
