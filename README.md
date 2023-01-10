@@ -43,5 +43,6 @@ You can find details in each workshop's `README.md` for lessons you can learn fr
 | [📓 Solana Journal](./workshops/solana-journal) | A simple journal entry dApp writing entries to the Solana blockchain. | Joe Caulfield |
 | [🐦 Solana Twitter](./workshops/solana-twitter) | A mock Twitter social media site built on top of on-chain data. | Joe Caulfield |
 | [🪓 Battle Royale](./workshops/battle-royale) | A fun little game leveraging on-chain data. | Joe Caulfield |
+| [🪙 Token Swap](./workshops/token-swap) | Token swapping platform mimicing a DEX. | Joe Caulfield |
 | [🛒 Building a Storefront with Solana Pay](./workshops/storefront-solanapay) | A storefront dApp capable of taking payments of SPL tokens using the Solana Pay SDK and Transaction Requests | Joe Caulfield |
 | [☄️ Ship Your First xNFT](./workshops/ship-an-xnft) | Building an xNFT and deploying it to Backpack | Valentin Madrid |
