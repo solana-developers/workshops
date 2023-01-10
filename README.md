@@ -26,8 +26,10 @@ width="150"
 ---
 
 ### ✏️ Contributing
-
 Please see [CONTRIBUTING](./CONTRIBUTING.md) for instructions on contributing new workshops or modifying existing ones.
+
+### 📗 Learning
+You can find details in each workshop's `README.md` for lessons you can learn from each workshop.
 
 ---
 
