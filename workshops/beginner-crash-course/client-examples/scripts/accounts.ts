@@ -1,7 +1,6 @@
 import { 
     Connection, 
     Keypair, 
-    LAMPORTS_PER_SOL, 
     PublicKey, 
     SystemProgram, 
 } from "@solana/web3.js"
@@ -21,7 +20,10 @@ import {
 
 const connection = new Connection(
     "https://api.devnet.solana.com", 
-    'confirmed'
+    {
+        commitment: 'confirmed',
+        confirmTransactionInitialTimeout: 60000,
+    },
 )
 
 const payer = loadKeypairFromFile(
@@ -48,6 +50,8 @@ async function createAccount(accountName: string, keypair: Keypair) {
         [createAccountInstruction]
     )
     const signature = await connection.sendTransaction(createAccountTransaction)
+    
+    newLogSection()
     logNewKeypair(keypair)
     await logTransaction(connection, signature)
     await logBalance(accountName, connection, keypair.publicKey)
@@ -55,11 +59,13 @@ async function createAccount(accountName: string, keypair: Keypair) {
 
 async function getAccountData(publicKey: PublicKey) {
     const accountInfo = await connection.getAccountInfo(publicKey)
+    newLogSection()
     logAccountInfo(accountInfo)
 }
 
 async function transferSol(fromKeypair: Keypair, toPublicKey: PublicKey) {
     
+    newLogSection()
     console.log("Starting balances:");
     await logBalance("Account A", connection, keypairA.publicKey)
     await logBalance("Account B", connection, keypairB.publicKey)

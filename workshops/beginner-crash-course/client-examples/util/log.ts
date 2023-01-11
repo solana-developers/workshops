@@ -1,3 +1,4 @@
+import { Account, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { 
     AccountInfo,
     Connection, 
@@ -6,6 +7,9 @@ import {
     PublicKey 
 } from "@solana/web3.js"
 
+export function newLogSection() {
+    console.log("-----------------------------------------------------")
+}
 
 export async function logAccountInfo(accountInfo: AccountInfo<Buffer> | null) {
     console.log("Account Info:")
@@ -30,7 +34,15 @@ export async function logBalance(accountName: string, connection: Connection, pu
     console.log(`       Account Balance: ${balance / LAMPORTS_PER_SOL} SOL`);
 }
 
-export function logNewMint(mintPubkey: PublicKey) {
+export function logNewMint(mintPubkey: PublicKey, decimals: number) {
     console.log("Created a new mint.")
     console.log(`   New mint Public Key: ${mintPubkey}`);
+    console.log(`   Mint type: ${decimals === 0 ? 'NFT' : 'SPL Token'}`);
+}
+
+export async function logTokenBalance(accountName: string, associatedTokenAccount: Account) {
+    console.log(`   ${accountName}:`);
+    console.log(`       ATA Pubkey      : ${associatedTokenAccount.address}`);
+    console.log(`       Mint            : ${associatedTokenAccount.mint}`);
+    console.log(`       Token Balance   : ${associatedTokenAccount.amount}`);
 }
