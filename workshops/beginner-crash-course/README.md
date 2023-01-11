@@ -199,6 +199,22 @@ https://github.com/solana-developers/workshops/blob/cffc4ce2945ad5528d9b2704f81d
 https://github.com/solana-developers/workshops/blob/cffc4ce2945ad5528d9b2704f81d6f64d030c76a/workshops/beginner-crash-course/client-examples/scripts/tokens.ts#L162-L202
    
 **→ Metadata**   
+We must create a separate metadata account that points to our mint to give our token metadata - such as an image.   
+   
+For this, we use the library for **Metaplex Token Metadata** - the standard for SPL Token metadata on Solana.   
+```json
+{
+    "dependencies": {
+        ...
+        "@metaplex-foundation/mpl-token-metadata": "^2.5.2",
+    }
+}
+```
+   
+Metaplex's SDK will let us use helper methods to create the necessary instructions, which will target the Metaplex Token Metadata Program.   
+
+🔸 Here's where we create the instruction for creating this metadata account, using Metaplex's data types:   
+https://github.com/solana-developers/workshops/blob/62ede19d9d0be5bbe290d9e4106be2f82a6b5846/workshops/beginner-crash-course/client-examples/scripts/tokens.ts#L104-L127
 
 ### 📝 [Writing Programs](https://solanacookbook.com/references/programs.html#how-to-transfer-sol-in-a-program)
 Most Solana operations can be done without writing your own program. In fact, many popular dApps on Solana simply leverage the client-side RPC interactions with the Solana network and don't utilize a custom program.   
