@@ -55,26 +55,26 @@ Accounts follow a basic structure:
    
 You can see, by default, accounts store some metadata - including a balance of SOL (Lamports).   
    
-**Rent**   
+**→ Rent**   
 Solana charges a user **rent** for storing data on the blockchain - even if it's just the default metadata. The more data you add to the `data` field, the more rent you will be responsible for paying.   
 This is due to the simple fact that Solana cluster nodes pay for hardware, which is where your data will be stored. This distributes the cost across the cluster similar to a market.   
 **Note:** You can make an account rent-exempt by depositing a SOL (Lamports) value equivalent to 2 year's worth of rent. This will effectively halt rent withdrawals on your account and leave your balance in tact.   
    
 It's worth noting that the amount you pay in rent is almost negligible for most accounts.   
    
-**Executable Accounts**   
+**→ Executable Accounts**   
 Simply put, everything on Solana is an account, even smart contracts.   
    
 Smart contracts (Programs) live inside of accounts, and in order to tell the cluster that an account is actually an executable program, the boolean `executable` is used.   
    
-**Data**   
+**→ Data**   
 The `data` field is called an account's "inner data" and that's where you can store your own custom data.   
    
 This data is stored in the form of bytes, and you need to serialize traditional data into bytes in order to store it inside an account.   
    
 More on this later.   
    
-**Ownership**   
+**→ Ownership**   
 Ownership is an extremely important concept in Solana.   
 Basically, every account is owned by a program. When a program owns an account, it's allowed to modify it's data at will.   
    
@@ -92,7 +92,7 @@ In order to conduct operations on Solana, you need to use a networking protocol 
    
 RPC is similar to HTTP in the sense that you are basically sending a GET or POST request to the Solana network to conduct some sort of business.   
    
-**Requesting Data from Solana**   
+**→ Requesting Data from Solana**   
 To query state information on Solana without making changes, you can send an RPC request to recieve a certain response with your desired information.   
    
 You can do this by setting up a connection to the Solana network, and sending a request.   
@@ -100,7 +100,7 @@ You can do this by setting up a connection to the Solana network, and sending a 
 🔸 Here's what that looks like in JavaScript - where we're requesting information about an account:   
 <>
    
-**Modifying Data on Solana**   
+**→ Modifying Data on Solana**   
 To modify state on Solana, you can also send an RPC request, but you'll need to package this request into what's called a Transaction.   
    
 Transactions are structured data payloads that can be signed by a keypair's private key - which allows for cryptographic authentication as we described above.   
@@ -123,13 +123,13 @@ A transaction looks like this:
 <>
 
 ### 🪙 [Tokens](https://solanacookbook.com/references/token.html)
-**SPL**   
-**Associated Token Accounts**   
-**Metadata**   
+**→ SPL**   
+**→ Associated Token Accounts**   
+**→ Metadata**   
 
 ### 📝 [Writing Programs](https://solanacookbook.com/references/programs.html#how-to-transfer-sol-in-a-program)
-**Program Structure**   
-**Deserializing Instructions**   
-**Sending Transactions to Your Program**   
-**Serializing Data**   
-**Building Custom Instructions**   
+**→ Program Structure**   
+**→ Deserializing Instructions**   
+**→ Sending Transactions to Your Program**   
+**→ Serializing Data**   
+**→ Building Custom Instructions**   
