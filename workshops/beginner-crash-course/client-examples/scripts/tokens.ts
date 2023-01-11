@@ -1,5 +1,5 @@
 import {
-    //
+    createCreateMetadataAccountInstruction, PROGRAM_ID,
 } from '@metaplex-foundation/mpl-token-metadata'
 import {
     AuthorityType,
@@ -80,7 +80,10 @@ async function createAccount(accountName: string, keypair: Keypair) {
 //
 async function createToken(
     mintKeypair: Keypair, 
-    decimals: number
+    decimals: number,
+    tokenName: string,
+    tokenSymbol: string,
+    tokenUri: string,
 ) {
     // Create the account for the Mint
     const createMintAccountInstruction = SystemProgram.createAccount({
@@ -98,12 +101,35 @@ async function createToken(
         payer.publicKey,
     );
     // Create the Metadata account for the Mint
-    // ?
+    const createMetadataInstruction = createCreateMetadataAccountInstruction(
+        {
+            metadata: PublicKey.findProgramAddressSync(
+                [ Buffer.from('metadata'), PROGRAM_ID.toBuffer(), mintKeypair.publicKey.toBuffer() ],
+                PROGRAM_ID,
+            )[0],
+            mint: mintKeypair.publicKey,
+            mintAuthority: payer.publicKey,
+            payer: payer.publicKey,
+            updateAuthority: payer.publicKey,
+        },
+        {
+            createMetadataAccountArgs: {
+                data: {
+                    creators: null,
+                    name: tokenName,
+                    symbol: tokenSymbol,
+                    uri: tokenUri,
+                    sellerFeeBasisPoints: 0,
+                },
+                isMutable: false,
+            }
+        }
+    )
     const tx = await buildTransaction(
         connection, 
         payer.publicKey, 
         [payer, mintKeypair], 
-        [createMintAccountInstruction, initializeMintInstruction],
+        [createMintAccountInstruction, initializeMintInstruction, createMetadataInstruction],
     )
     const signature = await connection.sendTransaction(tx)
 
@@ -205,8 +231,22 @@ async function tokensScript() {
     await createAccount("Test User Keypair #1", testUserKeypair1)
     await createAccount("Test User Keypair #2", testUserKeypair2)
     
-    await createToken(tokenMintKeypair, 9)  // SPL Token
-    await createToken(nftMintKeypair, 0)    // NFT
+    // SPL Token
+    await createToken(
+        tokenMintKeypair, 
+        9,
+        "My Token",
+        "MYTKN",
+        "https://raw.githubusercontent.com/solana-developers/workshops/main/workshops/beginner-crash-course/client-examples/assets/my-token.json"
+    )
+    // NFT
+    await createToken(
+        nftMintKeypair, 
+        0,
+        "My NFT",
+        "MYNFT",
+        "https://raw.githubusercontent.com/solana-developers/workshops/main/workshops/beginner-crash-course/client-examples/assets/my-nft.json"
+    )
 
     await mintToWallet(
         tokenMintKeypair.publicKey,
