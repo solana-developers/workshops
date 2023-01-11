@@ -142,6 +142,15 @@ On Solana, tokens are managed like so:
    
 All tokens are managed by the **Token Program** - another native Solana program in charge of SPL tokens.   
    
+For working with SPL tokens in TypeScript, we use the following library:   
+```json
+{
+    "dependencies": {
+        "@solana/spl-token": "^0.3.7",
+    }
+}
+```
+   
 🔸 Here's what creating a Mint looks like with the Token Program:   
 https://github.com/solana-developers/workshops/blob/cffc4ce2945ad5528d9b2704f81d6f64d030c76a/workshops/beginner-crash-course/client-examples/scripts/tokens.ts#L81-L113
    
@@ -201,11 +210,10 @@ https://github.com/solana-developers/workshops/blob/cffc4ce2945ad5528d9b2704f81d
 **→ Metadata**   
 We must create a separate metadata account that points to our mint to give our token metadata - such as an image.   
    
-For this, we use the library for **Metaplex Token Metadata** - the standard for SPL Token metadata on Solana.   
+For this, we use the library for **Metaplex Token Metadata** - the standard for SPL Token metadata on Solana:   
 ```json
 {
     "dependencies": {
-        ...
         "@metaplex-foundation/mpl-token-metadata": "^2.5.2",
     }
 }
