@@ -123,8 +123,62 @@ A transaction looks like this:
 https://github.com/solana-developers/workshops/blob/33ee92c20f4a15e0f8da3d16708a49a16ac8bb10/workshops/beginner-crash-course/client-examples/scripts/accounts.ts#L66-L90
 
 ### 🪙 [Tokens](https://solanacookbook.com/references/token.html)
-**→ SPL**   
+Tokens on Solana are called SPL Tokens, and they follow a standard just like tokens on Ethereum.   
+   
+On Solana, tokens are managed like so:
+* A Mint account is an account representing the token itself.
+* Associated Token Accounts are accounts that tie a wallet address to a mint address and describe that wallet's balance of that mint.
+* Metadata accounts are separate accounts that point to the Mint account and define all of the associated metadata for a token.
+   
+All tokens are managed by the **Token Program** - another native Solana program in charge of SPL tokens.   
+   
+**→ Mint Accounts**   
+A Mint account contains standard data about a particular token mint:
+```javascript
+{
+    isInitialized,
+    supply,             // The current supply of this token mint on Solana
+    decimals,           // The number of decimals this mint breaks down to
+    mintAuthority,      // The account who can authorize minting of new tokens
+    freezeAuthority,    // The account who can authorize freezing of tokens
+}
+```
+
+**→ Decimals**   
+A Mint's decimals define how the token's supply is broken up.   
+   
+For example, for a Mint whose decimals value is set to 3, if you send 5 tokens to someone, they will actually be receiving 0.005 tokens.   
+   
+Calculation: `quantity * 10 ^ (-1 * d)` where d = decimals.   
+   
+The standard for SPL Tokens on Solana is 9 decimals, but you can specify any decimal value you want.   
+   
+NFTs have a decimal value of 0. More on this later.   
+   
+**→ Mint Authority**   
+The **Mint Authority** is the account that is allowed to create (mint) new tokens.   
+   
+The Token Program does the actual minting of new tokens, but it's only authorized to do so if the Mint's specified Mint Authority has signed the transaction.   
+   
+When a Mint Authority is set to `None`, that means no more new tokens can be minted. This action is irreversible.   
+   
+**→ Freeze Authority**   
+The **Freeze Authority** is the account that is allowed to freeze token movement.   
+   
+This means that a "freeze" is placed on the Mint, and no transfers amongst any Associated Token Accounts regarding that Mint can be conducted.   
+   
+When a Freeze Authority is set to `None`, that means this token cannot be frozen. This action is irreversible.   
+   
+
 **→ Associated Token Accounts**   
+Associated Token Accounts are accounts designed to describe how many tokens a particular wallet holds.   
+   
+Since Solana accounts only have a default field for Lamports, and many different kinds of SPL tokens can be created by anyone, it's impossible to include a field for every possible SPL token in an account.   
+   
+Instead, we make use of separate accounts - called Associated Token Accounts - to keep track of a wallet's balance of a particular token.   
+   
+These accounts essentially have 2 pointers - the wallet it's associated with and the Mint it's associated with - and a balance.   
+   
 **→ Metadata**   
 
 ### 📝 [Writing Programs](https://solanacookbook.com/references/programs.html#how-to-transfer-sol-in-a-program)
