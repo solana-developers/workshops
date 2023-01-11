@@ -12,6 +12,7 @@ import {
     logBalance,
     logNewKeypair,
     logTransaction,
+    newLogSection,
 } from '../util/log'
 import {
     buildTransaction
