@@ -4,4 +4,4 @@
 
 ### [<img src="../../.docs/slides-icon.svg" alt="slides" width="20" align="center"/> Presentation Slides](https://github.com/solana-developers)
 
-### 📋 Step-By-Step Tutorial:
+### 📋 Step-By-Step Tutorial

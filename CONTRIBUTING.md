@@ -1,5 +1,9 @@
 # Contributing
 
+**🔑 🔑  The [Solana Beginner Crash Course](./workshops/beginner-crash-course) workshop was just recently completed. Let this serve as a template for all future workshops, including associated documentation and recordings.**
+
+---
+
 These workshops serve as great real estate for plucking reference examples on how to do specific things on Solana for [Solana Cookbook](https://solanacookbook.com/).   
    
 To read how you can pluck reference examples from these workshops, see the [Plucking Reference Examples](#plucking-reference-examples) section below.
