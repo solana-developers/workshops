@@ -3,7 +3,7 @@
 ## 🎬 Recorded Sessions
 | Link | Instructor | Event |
 | ---- | ---------- | ----- |
-| [<img src="../../.docs/youtube-icon.png" alt="youtube" width="20" align="center"/>](https://github.com/solana-developers) | Coming soon! | Coming soon! |
+| [<img src="../../.docs/youtube-icon.png" alt="youtube" width="20" align="center"/>](https://www.youtube.com/watch?v=FQYmWWw5l04) | Joe Caulfield | Encode Hackathon 2023 |
 
 ## 📗 Learn
 
@@ -20,6 +20,11 @@ We'll cover the following concepts:
 * [Transacting with Solana's Network](#🖲️-transacting-with-solanas-networkhttpsdocssolanacomdevelopingprogramming-modeltransactions)
     * Requesting Data from Solana
     * Modifying Data on Solana
+* [Writing Programs](#📝-writing-programshttpssolanacookbookcomreferencesprogramshtmlhow-to-transfer-sol-in-a-program)
+    * Program Structure
+    * Building Custom Instructions for Your Program
+    * Building Custom Instructions on the Client-Side
+    * Frameworks for Writing Solana Programs
 * [Tokens](#🪙-tokenshttpssolanacookbookcomreferencestokenhtml)
     * Mint Accounts
     * Decimals
@@ -27,11 +32,6 @@ We'll cover the following concepts:
     * Freeze Authority
     * Associated Token Accounts
     * Metadata
-* [Writing Programs](#📝-writing-programshttpssolanacookbookcomreferencesprogramshtmlhow-to-transfer-sol-in-a-program)
-    * Program Structure
-    * Building Custom Instructions for Your Program
-    * Building Custom Instructions on the Client-Side
-    * Frameworks for Writing Solana Programs
 
 ### 🔑 [Keypairs](https://solanacookbook.com/references/keypairs-and-wallets.html#how-to-generate-a-new-keypair)
 Solana wallets are like other crypto wallets - they utilize a **public key** and **private key**.   
@@ -148,7 +148,71 @@ A transaction instruction looks like this:
    
 🔸 Here's an example of sending a transaction in TypeScript - where we're going to transfer some SOL out of our account:   
 https://github.com/solana-developers/workshops/blob/33ee92c20f4a15e0f8da3d16708a49a16ac8bb10/workshops/beginner-crash-course/client-examples/scripts/accounts.ts#L66-L90
+   
+### 📝 [Writing Programs](https://solanacookbook.com/references/programs.html#how-to-transfer-sol-in-a-program)
+Most Solana operations can be done without writing your own program. In fact, many popular dApps on Solana simply leverage the client-side RPC interactions with the Solana network and don't utilize a custom program.   
+   
+However, you may find the need to write your own program for many reasons.   
+   
+When writing your own program, there are a few things to understand:
+* The structure of a Solana program
+* How to set up multiple instructions
+* How to serialize your program's instructions from the client side
+* How to send a transaction to your custom program
+   
+Solana programs are written in Rust, and leverage the `solana-program` crate, as well as many others including `spl-token` - depending on what your program does.   
+   
+**→ Program Structure**   
+All Solana programs - whether they are custom programs or native programs - follow the same structure.   
 
+Programs have an **entrypoint** - which tells the Solana runtime where the entrypoint to this program is. The entrypoint is simply the function that has been specifically designed to process a Transaction Instruction.   
+
+If you look at the anatomy of a Transaction Instruction above - under [Transacting with Solana's Network](#🖲️-transacting-with-solanas-networkhttpsdocssolanacomdevelopingprogramming-modeltransactions) - you can see why a Solana program's entrypoint must look like this:
+```rust
+fn my_program(
+    program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    instruction_data: &[u8],
+) -> ProgramResult
+```
+   
+🔸 Here's a simple Solana program demonstrating this entrypoint in action:   
+https://github.com/solana-developers/workshops/blob/b1cb19170da82bf59f57c4b646b6612c4501d8ec/workshops/beginner-crash-course/hello-world/program/src/lib.rs#L1-L31
+   
+Solana programs written in Rust must be of crate type `lib` and declare a specific lib type known as `cdylib`.   
+You can specify this configuration in the `Cargo.toml` file like so:
+```toml
+[lib]
+crate-type = ["cdylib", "lib"]
+```
+   
+**→ Building Custom Instructions for Your Program**   
+The `instruction_data` field within a transaction instruction is the data that you can use to tell your program which operation to conduct.   
+   
+You can define custom instruction payloads in Rust using structs, and use an enum to match against the various structs you've defined.   
+To do this, you need to leverage the `borsh` and `borsh-derive` crates to allow Rust to deserialize these objects from the instruction payload.   
+   
+🔸 Here's an example of using such structs and an enum to create instructions:   
+https://github.com/solana-developers/workshops/blob/5e7288353b9a716415ff9d558b8248d806a978f6/workshops/beginner-crash-course/hello-world-again/program/src/lib.rs#L11-L26
+   
+🔸 Here's a more built-out Solana program demonstrating instruction processing:   
+https://github.com/solana-developers/workshops/blob/5e7288353b9a716415ff9d558b8248d806a978f6/workshops/beginner-crash-course/hello-world-again/program/src/lib.rs#L1-L61
+   
+**→ Building Custom Instructions on the Client-Side**   
+On the client side, you have to replicate the structs that you defined on-chain in Rust.   
+   
+You can do this by again using `borsh` to serialize objects into bytes.   
+   
+🔸 Here's how to build a schema for matching an instruction struct defined in Rust:   
+https://github.com/solana-developers/workshops/blob/701c1df2d4ce16d1543dddfb7f5056114ebe9245/workshops/beginner-crash-course/hello-world-again/tests/instructions.ts#L15-L61
+   
+🔸 Now here's an example of sending different instructions to our custom program:   
+https://github.com/solana-developers/workshops/blob/701c1df2d4ce16d1543dddfb7f5056114ebe9245/workshops/beginner-crash-course/hello-world-again/tests/test.ts#L27-L40
+   
+**→ Frameworks for Writing Solana Programs**   
+* ⚓️ [Anchor](https://www.anchor-lang.com/)
+* 🐴 [Seahorse](https://seahorse-lang.org/)
+   
 ### 🪙 [Tokens](https://solanacookbook.com/references/token.html)
 Tokens on Solana are called SPL Tokens, and they follow a standard just like tokens on Ethereum.   
    
@@ -240,67 +304,3 @@ Metaplex's SDK will let us use helper methods to create the necessary instructio
 
 🔸 Here's where we create the instruction for creating this metadata account, using Metaplex's data types:   
 https://github.com/solana-developers/workshops/blob/62ede19d9d0be5bbe290d9e4106be2f82a6b5846/workshops/beginner-crash-course/client-examples/scripts/tokens.ts#L104-L127
-
-### 📝 [Writing Programs](https://solanacookbook.com/references/programs.html#how-to-transfer-sol-in-a-program)
-Most Solana operations can be done without writing your own program. In fact, many popular dApps on Solana simply leverage the client-side RPC interactions with the Solana network and don't utilize a custom program.   
-   
-However, you may find the need to write your own program for many reasons.   
-   
-When writing your own program, there are a few things to understand:
-* The structure of a Solana program
-* How to set up multiple instructions
-* How to serialize your program's instructions from the client side
-* How to send a transaction to your custom program
-   
-Solana programs are written in Rust, and leverage the `solana-program` crate, as well as many others including `spl-token` - depending on what your program does.   
-   
-**→ Program Structure**   
-All Solana programs - whether they are custom programs or native programs - follow the same structure.   
-
-Programs have an **entrypoint** - which tells the Solana runtime where the entrypoint to this program is. The entrypoint is simply the function that has been specifically designed to process a Transaction Instruction.   
-
-If you look at the anatomy of a Transaction Instruction above - under [Transacting with Solana's Network](#🖲️-transacting-with-solanas-networkhttpsdocssolanacomdevelopingprogramming-modeltransactions) - you can see why a Solana program's entrypoint must look like this:
-```rust
-fn my_program(
-    program_id: &Pubkey,
-    accounts: &[AccountInfo],
-    instruction_data: &[u8],
-) -> ProgramResult
-```
-   
-🔸 Here's a simple Solana program demonstrating this entrypoint in action:   
-https://github.com/solana-developers/workshops/blob/b1cb19170da82bf59f57c4b646b6612c4501d8ec/workshops/beginner-crash-course/hello-world/program/src/lib.rs#L1-L31
-   
-Solana programs written in Rust must be of crate type `lib` and declare a specific lib type known as `cdylib`.   
-You can specify this configuration in the `Cargo.toml` file like so:
-```toml
-[lib]
-crate-type = ["cdylib", "lib"]
-```
-   
-**→ Building Custom Instructions for Your Program**   
-The `instruction_data` field within a transaction instruction is the data that you can use to tell your program which operation to conduct.   
-   
-You can define custom instruction payloads in Rust using structs, and use an enum to match against the various structs you've defined.   
-To do this, you need to leverage the `borsh` and `borsh-derive` crates to allow Rust to deserialize these objects from the instruction payload.   
-   
-🔸 Here's an example of using such structs and an enum to create instructions:   
-https://github.com/solana-developers/workshops/blob/5e7288353b9a716415ff9d558b8248d806a978f6/workshops/beginner-crash-course/hello-world-again/program/src/lib.rs#L11-L26
-   
-🔸 Here's a more built-out Solana program demonstrating instruction processing:   
-https://github.com/solana-developers/workshops/blob/5e7288353b9a716415ff9d558b8248d806a978f6/workshops/beginner-crash-course/hello-world-again/program/src/lib.rs#L1-L61
-   
-**→ Building Custom Instructions on the Client-Side**   
-On the client side, you have to replicate the structs that you defined on-chain in Rust.   
-   
-You can do this by again using `borsh` to serialize objects into bytes.   
-   
-🔸 Here's how to build a schema for matching an instruction struct defined in Rust:   
-https://github.com/solana-developers/workshops/blob/701c1df2d4ce16d1543dddfb7f5056114ebe9245/workshops/beginner-crash-course/hello-world-again/tests/instructions.ts#L15-L61
-   
-🔸 Now here's an example of sending different instructions to our custom program:   
-https://github.com/solana-developers/workshops/blob/701c1df2d4ce16d1543dddfb7f5056114ebe9245/workshops/beginner-crash-course/hello-world-again/tests/test.ts#L27-L40
-   
-**→ Frameworks for Writing Solana Programs**   
-* ⚓️ [Anchor](https://www.anchor-lang.com/)
-* 🐴 [Seahorse](https://seahorse-lang.org/)
