@@ -34,7 +34,7 @@ Arguably the most important native program is the **System Program** - which is 
    
 To register a public key with Solana, we must use the System Program. This will effectively register our keypair's public key as an **address** and create an **account** on Solana's blockchain. The account's address will mark the specific location of our account on Solana's blockchain.   
    
-🔸 Here's what registering a keypair's public key with the System Program looks like in JavaScript:   
+🔸 Here's what registering a keypair's public key with the System Program looks like in TypeScript:   
 https://github.com/solana-developers/workshops/blob/33ee92c20f4a15e0f8da3d16708a49a16ac8bb10/workshops/beginner-crash-course/client-examples/scripts/accounts.ts#L36-L58
 
 ### 📂 [Accounts](https://solanacookbook.com/core-concepts/accounts.html#facts)
@@ -97,7 +97,7 @@ To query state information on Solana without making changes, you can send an RPC
    
 You can do this by setting up a connection to the Solana network, and sending a request.   
    
-🔸 Here's what that looks like in JavaScript - where we're requesting information about an account:   
+🔸 Here's what that looks like in TypeScript - where we're requesting information about an account:   
 https://github.com/solana-developers/workshops/blob/33ee92c20f4a15e0f8da3d16708a49a16ac8bb10/workshops/beginner-crash-course/client-examples/scripts/accounts.ts#L60-L64
    
 **→ Modifying Data on Solana**   
@@ -106,7 +106,7 @@ To modify state on Solana, you can also send an RPC request, but you'll need to 
 Transactions are structured data payloads that can be signed by a keypair's private key - which allows for cryptographic authentication as we described above.   
    
 A transaction looks like this:
-```javascript
+```TypeScript
 {
     signatures: [ s, s ]            // List of signatures
     message:
@@ -119,7 +119,7 @@ A transaction looks like this:
    
 **Note:** A **recent blockhash** is included in Solana transactions as a security measure. Basically, the network is going to make sure this isn't an old transaction to prevent against fraud or hacks.   
    
-🔸 Here's an example of sending a transaction in JavaScript - where we're going to transfer some SOL out of our account:   
+🔸 Here's an example of sending a transaction in TypeScript - where we're going to transfer some SOL out of our account:   
 https://github.com/solana-developers/workshops/blob/33ee92c20f4a15e0f8da3d16708a49a16ac8bb10/workshops/beginner-crash-course/client-examples/scripts/accounts.ts#L66-L90
 
 ### 🪙 [Tokens](https://solanacookbook.com/references/token.html)
@@ -132,9 +132,12 @@ On Solana, tokens are managed like so:
    
 All tokens are managed by the **Token Program** - another native Solana program in charge of SPL tokens.   
    
+🔸 Here's what creating a Mint looks like with the Token Program:   
+https://github.com/solana-developers/workshops/blob/cffc4ce2945ad5528d9b2704f81d6f64d030c76a/workshops/beginner-crash-course/client-examples/scripts/tokens.ts#L81-L113
+   
 **→ Mint Accounts**   
 A Mint account contains standard data about a particular token mint:
-```javascript
+```TypeScript
 {
     isInitialized,
     supply,             // The current supply of this token mint on Solana
@@ -178,6 +181,12 @@ Since Solana accounts only have a default field for Lamports, and many different
 Instead, we make use of separate accounts - called Associated Token Accounts - to keep track of a wallet's balance of a particular token.   
    
 These accounts essentially have 2 pointers - the wallet it's associated with and the Mint it's associated with - and a balance.   
+   
+🔸 Here's what minting tokens to an Associated Token Account looks like in TypeScript:   
+https://github.com/solana-developers/workshops/blob/cffc4ce2945ad5528d9b2704f81d6f64d030c76a/workshops/beginner-crash-course/client-examples/scripts/tokens.ts#L115-L160
+   
+🔸 Here's what transferring tokens between Associated Token Accounts looks like in TypeScript:   
+https://github.com/solana-developers/workshops/blob/cffc4ce2945ad5528d9b2704f81d6f64d030c76a/workshops/beginner-crash-course/client-examples/scripts/tokens.ts#L162-L202
    
 **→ Metadata**   
 
