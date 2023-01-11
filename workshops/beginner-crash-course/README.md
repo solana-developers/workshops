@@ -3,7 +3,7 @@
 ## 🎬 Recorded Sessions
 | Link | Instructor | Event |
 | ---- | ---------- | ----- |
-| [<img src="../../.docs/youtube-icon.png" alt="youtube" width="20" align="center"/>](https://www.youtube.com/watch?v=FQYmWWw5l04) | Joe Caulfield | Encode Hackathon 2023 |
+| [<img src="../../.docs/youtube-icon.png" alt="youtube" width="20" align="center"/> Video](https://www.youtube.com/watch?v=FQYmWWw5l04) | Joe Caulfield | Encode Hackathon 2023 |
 
 ## 📗 Learn
 
