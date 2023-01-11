@@ -10,11 +10,28 @@
 We're going to cover the basics of Solana development to get you started building on Solana.   
    
 We'll cover the following concepts:
-* Keypairs
-* The System Program
-* Connections:
-    * Interacting with the Solana cluster using RPC
-    * Sending instructions to Solana via Transactions
+* [Keypairs](#🔑-keypairshttpssolanacookbookcomreferenceskeypairs-and-walletshtmlhow-to-generate-a-new-keypair)
+* [The System Program](#⚙️-the-system-programhttpsdocssolanacomdevelopingruntime-facilitiesprograms)
+* [Accounts](#📂-accountshttpssolanacookbookcomcore-conceptsaccountshtmlfacts)
+    * Rent
+    * Executable Accounts
+    * Data
+    * Ownership
+* [Transacting with Solana's Network](#🖲️-transacting-with-solanas-networkhttpsdocssolanacomdevelopingprogramming-modeltransactions)
+    * Requesting Data from Solana
+    * Modifying Data on Solana
+* [Tokens](#🪙-tokenshttpssolanacookbookcomreferencestokenhtml)
+    * Mint Accounts
+    * Decimals
+    * Mint Authority
+    * Freeze Authority
+    * Associated Token Accounts
+    * Metadata
+* [Writing Programs](#📝-writing-programshttpssolanacookbookcomreferencesprogramshtmlhow-to-transfer-sol-in-a-program)
+    * Program Structure
+    * Building Custom Instructions for Your Program
+    * Building Custom Instructions on the Client-Side
+    * Frameworks for Writing Solana Programs
 
 ### 🔑 [Keypairs](https://solanacookbook.com/references/keypairs-and-wallets.html#how-to-generate-a-new-keypair)
 Solana wallets are like other crypto wallets - they utilize a **public key** and **private key**.   
