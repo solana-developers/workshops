@@ -11,7 +11,7 @@ import {
 } from '@solana/web3.js'
 
 
-function createKeypairFromFile(path: string): Keypair {
+function loadKeypairFromFile(path: string): Keypair {
     return Keypair.fromSecretKey(
         Buffer.from(JSON.parse(require('fs').readFileSync(path, "utf-8")))
     )
@@ -21,8 +21,8 @@ function createKeypairFromFile(path: string): Keypair {
 describe("hello-solana", () => {
 
     const connection = new Connection(`https://api.devnet.solana.com`, 'confirmed')
-    const payer = createKeypairFromFile(require('os').homedir() + '/.config/solana/id.json')
-    const program = createKeypairFromFile('./program/target/deploy/program-keypair.json')
+    const payer = loadKeypairFromFile(require('os').homedir() + '/.config/solana/id.json')
+    const program = loadKeypairFromFile('./program/target/deploy/program-keypair.json')
   
     it("Say hello!", async () => {
 

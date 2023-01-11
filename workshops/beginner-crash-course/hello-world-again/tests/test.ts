@@ -7,11 +7,11 @@ import {
     Keypair,
     sendAndConfirmTransaction,
     Transaction,
-    TransactionInstruction,
 } from '@solana/web3.js'
+import { createSayGoodbyeInstruction, createSayHelloInstruction } from './instructions'
 
 
-function createKeypairFromFile(path: string): Keypair {
+function loadKeypairFromFile(path: string): Keypair {
     return Keypair.fromSecretKey(
         Buffer.from(JSON.parse(require('fs').readFileSync(path, "utf-8")))
     )
@@ -21,18 +21,32 @@ function createKeypairFromFile(path: string): Keypair {
 describe("hello-solana", () => {
 
     const connection = new Connection(`https://api.devnet.solana.com`, 'confirmed')
-    const payer = createKeypairFromFile(require('os').homedir() + '/.config/solana/id.json')
-    const program = createKeypairFromFile('./program/target/deploy/program-keypair.json')
+    const payer = loadKeypairFromFile(require('os').homedir() + '/.config/solana/id.json')
+    const program = loadKeypairFromFile('./program/target/deploy/program-keypair.json')
   
     it("Say hello!", async () => {
 
-        let ix = new TransactionInstruction({
-            keys: [
-                {pubkey: payer.publicKey, isSigner: true, isWritable: true}
-            ],
-            programId: program.publicKey,
-            data: Buffer.alloc(0), // No data
-        })
+        let ix = createSayHelloInstruction(
+            payer.publicKey,
+            program.publicKey,
+            "Hello, World!",
+        )
+
+        await sendAndConfirmTransaction(
+            connection, 
+            new Transaction().add(ix),
+            [payer]
+        )
+    })
+
+    it("Say goodbye!", async () => {
+
+        let ix = createSayGoodbyeInstruction(
+            payer.publicKey,
+            program.publicKey,
+            "Goodbye, World!",
+            "See You Next Time!",
+        )
 
         await sendAndConfirmTransaction(
             connection, 

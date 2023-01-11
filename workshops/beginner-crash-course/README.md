@@ -244,13 +244,21 @@ You can define custom instruction payloads in Rust using structs, and use an enu
 To do this, you need to leverage the `borsh` and `borsh-derive` crates to allow Rust to deserialize these objects from the instruction payload.   
    
 🔸 Here's an example of using such structs and an enum to create instructions:   
-https://github.com/solana-developers/workshops/blob/5e7288353b9a716415ff9d558b8248d806a978f6/workshops/beginner-crash-course/hello-world-again/program/src/lib.rs#L11-L36
+https://github.com/solana-developers/workshops/blob/5e7288353b9a716415ff9d558b8248d806a978f6/workshops/beginner-crash-course/hello-world-again/program/src/lib.rs#L11-L26
    
 🔸 Here's a more built-out Solana program demonstrating instruction processing:   
 https://github.com/solana-developers/workshops/blob/5e7288353b9a716415ff9d558b8248d806a978f6/workshops/beginner-crash-course/hello-world-again/program/src/lib.rs#L1-L61
    
 **→ Building Custom Instructions on the Client-Side**   
-🔸 Here's how we send different instructions to our custom program:   
+On the client side, you have to replicate the structs that you defined on-chain in Rust.   
+   
+You can do this by again using `borsh` to serialize objects into bytes.   
+   
+🔸 Here's how to build a schema for matching an instruction struct defined in Rust:   
+
+   
+🔸 Now here's an example of sending different instructions to our custom program:   
+
    
 **→ Frameworks for Writing Solana Programs**   
 * ⚓️ [Anchor](https://www.anchor-lang.com/)
