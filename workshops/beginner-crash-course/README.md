@@ -35,7 +35,7 @@ Arguably the most important native program is the **System Program** - which is 
 To register a public key with Solana, we must use the System Program. This will effectively register our keypair's public key as an **address** and create an **account** on Solana's blockchain. The account's address will mark the specific location of our account on Solana's blockchain.   
    
 🔸 Here's what registering a keypair's public key with the System Program looks like in JavaScript:   
-<>
+https://github.com/solana-developers/workshops/blob/33ee92c20f4a15e0f8da3d16708a49a16ac8bb10/workshops/beginner-crash-course/client-examples/scripts/accounts.ts#L36-L58
 
 ### 📂 [Accounts](https://solanacookbook.com/core-concepts/accounts.html#facts)
 You can think of Solana's global state as an operating system. In Linux, it's known that "everything is a file". You can swap the word "account" for "file" when talking about Solana, and majority of the concepts will be the same.   
@@ -98,7 +98,7 @@ To query state information on Solana without making changes, you can send an RPC
 You can do this by setting up a connection to the Solana network, and sending a request.   
    
 🔸 Here's what that looks like in JavaScript - where we're requesting information about an account:   
-<>
+https://github.com/solana-developers/workshops/blob/33ee92c20f4a15e0f8da3d16708a49a16ac8bb10/workshops/beginner-crash-course/client-examples/scripts/accounts.ts#L60-L64
    
 **→ Modifying Data on Solana**   
 To modify state on Solana, you can also send an RPC request, but you'll need to package this request into what's called a Transaction.   
@@ -120,7 +120,7 @@ A transaction looks like this:
 **Note:** A **recent blockhash** is included in Solana transactions as a security measure. Basically, the network is going to make sure this isn't an old transaction to prevent against fraud or hacks.   
    
 🔸 Here's an example of sending a transaction in JavaScript - where we're going to transfer some SOL out of our account:   
-<>
+https://github.com/solana-developers/workshops/blob/33ee92c20f4a15e0f8da3d16708a49a16ac8bb10/workshops/beginner-crash-course/client-examples/scripts/accounts.ts#L66-L90
 
 ### 🪙 [Tokens](https://solanacookbook.com/references/token.html)
 **→ SPL**   
