@@ -237,10 +237,20 @@ You can specify this configuration in the `Cargo.toml` file like so:
 crate-type = ["cdylib", "lib"]
 ```
    
-**→ Deserializing Instructions**   
-**→ Sending Transactions to Your Program**   
-**→ Serializing Data**   
-**→ Building Custom Instructions**   
+**→ Building Custom Instructions for Your Program**   
+The `instruction_data` field within a transaction instruction is the data that you can use to tell your program which operation to conduct.   
+   
+You can define custom instruction payloads in Rust using structs, and use an enum to match against the various structs you've defined.   
+To do this, you need to leverage the `borsh` and `borsh-derive` crates to allow Rust to deserialize these objects from the instruction payload.   
+   
+🔸 Here's an example of using such structs and an enum to create instructions:   
+
+   
+🔸 Here's a more built-out Solana program demonstrating instruction processing:   
+   
+**→ Building Custom Instructions on the Client-Side**   
+🔸 Here's how we send different instructions to our custom program:   
+   
 **→ Frameworks for Writing Solana Programs**   
 * ⚓️ [Anchor](https://www.anchor-lang.com/)
 * 🐴 [Seahorse](https://seahorse-lang.org/)
