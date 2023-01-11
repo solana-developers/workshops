@@ -116,6 +116,16 @@ A transaction looks like this:
         instructions: [ ix, ix ]    // The instructions to perform on Solana's state
 }
 ```
+You can see transactions have a list of instructions. These instructions point to specific Solana programs and tell them what to do.   
+   
+A transaction instruction looks like this:
+```TypeScript
+{
+    program_id: xxx             // The Solana program this instruction is targeting
+    accounts: [ aaa, aaa ]      // The accounts involved in this instruction
+    instruction_data: b[]       // The specific data that tells the program which operation to conduct
+}
+```
    
 **Note:** A **recent blockhash** is included in Solana transactions as a security measure. Basically, the network is going to make sure this isn't an old transaction to prevent against fraud or hacks.   
    
@@ -191,8 +201,46 @@ https://github.com/solana-developers/workshops/blob/cffc4ce2945ad5528d9b2704f81d
 **→ Metadata**   
 
 ### 📝 [Writing Programs](https://solanacookbook.com/references/programs.html#how-to-transfer-sol-in-a-program)
+Most Solana operations can be done without writing your own program. In fact, many popular dApps on Solana simply leverage the client-side RPC interactions with the Solana network and don't utilize a custom program.   
+   
+However, you may find the need to write your own program for many reasons.   
+   
+When writing your own program, there are a few things to understand:
+* The structure of a Solana program
+* How to set up multiple instructions
+* How to serialize your program's instructions from the client side
+* How to send a transaction to your custom program
+   
+Solana programs are written in Rust, and leverage the `solana-program` crate, as well as many others including `spl-token` - depending on what your program does.   
+   
 **→ Program Structure**   
+All Solana programs - whether they are custom programs or native programs - follow the same structure.   
+
+Programs have an **entrypoint** - which tells the Solana runtime where the entrypoint to this program is. The entrypoint is simply the function that has been specifically designed to process a Transaction Instruction.   
+
+If you look at the anatomy of a Transaction Instruction above - under [Transacting with Solana's Network](#🖲️-transacting-with-solanas-networkhttpsdocssolanacomdevelopingprogramming-modeltransactions) - you can see why a Solana program's entrypoint must look like this:
+```rust
+fn my_program(
+    program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    instruction_data: &[u8],
+) -> ProgramResult
+```
+   
+🔸 Here's a simple Solana program demonstrating this entrypoint in action:   
+https://github.com/solana-developers/workshops/blob/b1cb19170da82bf59f57c4b646b6612c4501d8ec/workshops/beginner-crash-course/hello-world/program/src/lib.rs#L1-L31
+   
+Solana programs written in Rust must be of crate type `lib` and declare a specific lib type known as `cdylib`.   
+You can specify this configuration in the `Cargo.toml` file like so:
+```toml
+[lib]
+crate-type = ["cdylib", "lib"]
+```
+   
 **→ Deserializing Instructions**   
 **→ Sending Transactions to Your Program**   
 **→ Serializing Data**   
 **→ Building Custom Instructions**   
+**→ Frameworks for Writing Solana Programs**   
+* ⚓️ [Anchor](https://www.anchor-lang.com/)
+* 🐴 [Seahorse](https://seahorse-lang.org/)
