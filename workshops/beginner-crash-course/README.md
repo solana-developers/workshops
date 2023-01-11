@@ -255,10 +255,10 @@ On the client side, you have to replicate the structs that you defined on-chain 
 You can do this by again using `borsh` to serialize objects into bytes.   
    
 🔸 Here's how to build a schema for matching an instruction struct defined in Rust:   
-
+https://github.com/solana-developers/workshops/blob/701c1df2d4ce16d1543dddfb7f5056114ebe9245/workshops/beginner-crash-course/hello-world-again/tests/instructions.ts#L15-L61
    
 🔸 Now here's an example of sending different instructions to our custom program:   
-
+https://github.com/solana-developers/workshops/blob/701c1df2d4ce16d1543dddfb7f5056114ebe9245/workshops/beginner-crash-course/hello-world-again/tests/test.ts#L27-L40
    
 **→ Frameworks for Writing Solana Programs**   
 * ⚓️ [Anchor](https://www.anchor-lang.com/)
