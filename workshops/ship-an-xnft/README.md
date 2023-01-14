@@ -362,7 +362,74 @@ now, create a folder named `"screens"` and create two files in it, one named `Ho
 Our HomeScreen.tsx will now look like this:
 
 ```ts
-HomeScreen.tsx after nav changes
+import { View, Text, TouchableOpacity } from 'react-native';
+import tw from 'twrnc';
+import {
+  createStackNavigator,
+  StackCardStyleInterpolator,
+} from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const Stack = createStackNavigator();
+
+const friends = [
+  { name: 'John', pubkey: '0x00001' },
+  { name: 'Bob', pubkey: '0x00002' },
+  { name: 'Jane', pubkey: '0x00003' },
+];
+
+function HomeScreen() {
+  return (
+    <Stack.Navigator
+      initialRouteName='Main'
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name='Main' component={MainPage} />
+      <Stack.Screen name='Send' component={SendPage} />
+    </Stack.Navigator>
+  );
+}
+
+function MainPage() {
+  const navigation = useNavigation();
+
+  return (
+    <View style={tw`h-full bg-[#133C55]`}>
+      <View style={tw`m-5`}>
+        <Text style={tw`text-white text-xl`}>Hey there, mega dev!</Text>
+        <Text style={tw`text-white text-lg mt-3`}>My frens:</Text>
+        {friends ? (
+          friends.map((friend) => (
+            <View
+              style={tw`bg-[#386FA4] p-3 rounded-lg mt-3 flex-row justify-between`}
+              key={friend.pubkey}
+            >
+              <Text style={tw`text-white  text-xl`}>{friend.name}</Text>
+              <TouchableOpacity
+                onPress={() => {}}
+                style={tw`rounded bg-[#84D2F6] text-white p-2 font-mono`}
+              >
+                <Text>Send</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        ) : (
+          <Text style={tw`text-white text-xl`}>No friends yet</Text>
+        )}
+      </View>
+    </View>
+  );
+}
+
+function SendPage() {
+  return <View></View>;
+}
+
+export default HomeScreen;
 ```
 
 So basically we will have two Pages in our Home Tab, one will be the Page where we see all of our friends, and the second one to send $SOL to your friend. The initial route will be the Main "Page", and we'll be able to navigate to the send page when clicking the Button.
@@ -370,7 +437,67 @@ So basically we will have two Pages in our Home Tab, one will be the Page where 
 This next part is going to get a bit more difficult to understand, let's look at how our App.tsx will look like now:
 
 ```ts
-App.tsx after navigation changes
+import { registerRootComponent } from 'expo';
+import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import tw from 'twrnc';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+import HomeScreen from './screens/HomeScreen';
+import FriendsScreen from './screens/FriendsScreen';
+
+const Tab = createBottomTabNavigator();
+
+function App() {
+  function TabNavigator() {
+    return (
+      <Tab.Navigator
+        initialRouteName='Home'
+        screenOptions={{
+          tabBarActiveTintColor: 'black',
+        }}
+      >
+        <Tab.Screen
+          name='Home'
+          component={HomeScreen}
+          options={{
+            headerShown: false,
+            tabBarLabel: 'Home',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name='account'
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name='List'
+          component={FriendsScreen}
+          options={{
+            headerShown: false,
+            tabBarLabel: 'Friends',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name='routes' color={color} size={size} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    );
+  }
+
+  return (
+    <NavigationContainer>
+      <TabNavigator />
+    </NavigationContainer>
+  );
+}
+
+export default registerRootComponent(App);
 ```
 
 We have two screens, Home and Friends, which you can navigate using the Navigation menu at the bottom of the App. When on the HomeScreen, you see the inital route of the HomeScreen Stack Navigator, which is our Main Page. When you click on the Friends Tab, you will see an empty screen, that we will fill out out in the next step. Take a second to look at the code and understand it. If you do not understand it, search up some docs or a tutorial for navigation in react native.
@@ -383,7 +510,60 @@ You can use regular React hooks as useEffect or useState in your xNFTs. So let's
 FriendsScreen.tsx
 
 ```ts
-Friends screen after react hooks
+import { View, Text, TextInput, Button } from 'react-native';
+import tw from 'twrnc';
+import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+function FriendsScreen() {
+  const [addFriend, setAddFriend] = useState({ name: '', pubkey: '' });
+  const [friends, setFriends] = useState<any>();
+
+  useEffect(() => {
+    const getFriends = async () => {
+      const friends = await AsyncStorage.getItem('friends');
+      console.log('friends', friends);
+      if (friends) {
+        setFriends(JSON.parse(friends));
+      }
+    };
+    getFriends();
+  }, []);
+
+  const addFriendToLS = () => {
+    AsyncStorage.setItem('friends', JSON.stringify([...friends, addFriend]));
+    setAddFriend({ name: '', pubkey: '' });
+  };
+
+  return (
+    <View style={tw`h-full bg-[#133C55]`}>
+      <View style={tw`m-5`}>
+        <Text style={tw`text-white text-xl`}>Friends</Text>
+        <View style={tw`p-3 rounded-lg mt-3`}>
+          <TextInput
+            onChangeText={(e) => setAddFriend({ ...addFriend, pubkey: e })}
+            style={tw`text-white  text-xl p-2 bg-[#386FA4] rounded-lg`}
+            placeholder={'Friends Pubkey'}
+            value={addFriend.pubkey}
+          />
+          <TextInput
+            onChangeText={(e) => setAddFriend({ ...addFriend, name: e })}
+            style={tw`text-white  text-xl p-2 bg-[#386FA4] rounded-lg mt-3`}
+            placeholder={'Friends Name'}
+            value={addFriend.name}
+          />
+        </View>
+        <Button
+          title='Add Friend'
+          color='black'
+          onPress={() => addFriendToLS()}
+        />
+      </View>
+    </View>
+  );
+}
+
+export default FriendsScreen;
 ```
 
 We store an object of the users Input called "addFriend" and an array with all the friends called "friends" in useState. On every render of the FriendsScreen, the app will get all the friends from LocalStorage. When adding a friend, we add the new friend to the total friends list and push the new list to AsyncStorage.
@@ -391,7 +571,44 @@ We store an object of the users Input called "addFriend" and an array with all t
 Now that we are storing our friends locally, let's open HomeScreen.tsx and get all the friends from AsyncStorage on page render for our MainPage() function, and don't forget to import useEffect at the top of the file.
 
 ```ts
-HomeScreen.tsx MainPage() after localstorage + useeffect
+function MainPage() {
+  const navigation = useNavigation();
+  const [friends, setFriends] = useState<any>(null);
+  useEffect(() => {
+    AsyncStorage.getItem('friends').then((friends) => {
+      if (friends) {
+        setFriends(JSON.parse(friends));
+      }
+    });
+  }, []);
+
+  return (
+    <View style={tw`h-full bg-[#133C55]`}>
+      <View style={tw`m-5`}>
+        <Text style={tw`text-white text-xl`}>Hey there, mega dev!</Text>
+        <Text style={tw`text-white text-lg mt-3`}>My frens:</Text>
+        {friends ? (
+          friends.map((friend) => (
+            <View
+              style={tw`bg-[#386FA4] p-3 rounded-lg mt-3 flex-row justify-between`}
+              key={friend.pubkey}
+            >
+              <Text style={tw`text-white  text-xl`}>{friend.name}</Text>
+              <TouchableOpacity
+                onPress={() => {}}
+                style={tw`rounded bg-[#84D2F6] text-white p-2 font-mono`}
+              >
+                <Text>Send</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        ) : (
+          <Text style={tw`text-white text-xl`}>No friends yet</Text>
+        )}
+      </View>
+    </View>
+  );
+}
 ```
 
 Now open your xNFT on Backpack, and add a friend on the friends Tab, use your own Public Key in the pubkey field. Look at the HomeScreen, you should have a new friend on there now. If it doesn't display, close and reopen your xNFT app.
