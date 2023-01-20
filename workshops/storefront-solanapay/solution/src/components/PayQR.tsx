@@ -12,12 +12,12 @@ const PayQR = () => {
     useEffect(() => {
     const { location } = window
     const reference = Keypair.generate().publicKey
-    const apiUrl = `${location.protocol}//${location.host}/api/transaction?network=${networkConfiguration}&reference=${reference.toBase58()}`
+    const apiUrl = `${location.protocol}//${location.host}/api/transaction?reference=${reference.toBase58()}`
     const urlParams: TransactionRequestURLFields = {
-      link: new URL(apiUrl),
-      label: "Solami Pizza",
+      link: new URL(apiUrl)
     };
     const solanaUrl = encodeURL(urlParams);
+    console.log(solanaUrl)
     const qr = createQR(solanaUrl, 512, 'transparent')
     qr.update({ backgroundOptions: { round: 1000 } });
     if (ref.current) {
