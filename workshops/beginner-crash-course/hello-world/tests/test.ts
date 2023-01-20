@@ -5,6 +5,7 @@ import {
 import {
     Connection,
     Keypair,
+    PublicKey,
     sendAndConfirmTransaction,
     Transaction,
     TransactionInstruction,
@@ -30,7 +31,8 @@ describe("hello-solana", () => {
             keys: [
                 {pubkey: payer.publicKey, isSigner: true, isWritable: true}
             ],
-            programId: program.publicKey,
+            // programId: program.publicKey,
+            programId: new PublicKey('3whVZdg3oSi1Wskt25dYLrqpLcXmTtXoyUyUrEjkcpNY'),
             data: Buffer.alloc(0), // No data
         })
 
