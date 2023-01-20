@@ -1,8 +1,10 @@
 "use client" // this makes next know that this page should be rendered in the client
 import { useState } from "react"
 import Image from 'next/image'
+import PayQR from "@/src/components/PayQR"
 
 export default function Home() {
+  const [pizzaScreen, setPizzaScreen] = useState(true)
   const [pizzaAddons, setPizzaAddons] = useState(
     [
       {
@@ -49,6 +51,7 @@ export default function Home() {
     // a main component for a pizza shop with a funny and playful background design in tailwindcss
     <main className="min-h-screen bg-red-500 p-2">
         <h1 className="text-4xl font-bold text-center">Pizza Shop</h1>
+{pizzaScreen ? (
         <div className="flex flex-col md:flex-row justify-center">
           <div className="w-full md:w-1/2">
             <div className="bg-white shadow-md rounded-2xl my-6 mr-2 overflow-hidden">
@@ -62,8 +65,8 @@ export default function Home() {
                   ))}
                 </ul>
                 <h2>Total amount : {total}€</h2>
-                <button className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full my-3">
-                  Add to Cart
+                <button onClick={() => setPizzaScreen(false)} className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full my-3">
+                  Proceed to Payment
                 </button>
               </div>
             </div>
@@ -86,7 +89,15 @@ export default function Home() {
             </div>
           </div>
         </div>
-      
+) : (
+        <div className="flex flex-col h-screen my-auto items-center bgimg bg-cover">
+          
+          <PayQR />
+          <button onClick={() => setPizzaScreen(true)} className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full my-3">
+            Edit Order
+          </button>
+          </div>
+)}
     </main>
   
 
