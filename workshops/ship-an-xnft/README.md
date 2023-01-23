@@ -105,7 +105,8 @@ function App() {
 export default registerRootComponent(App);
 ```
 
-**1. 5 - Styling with CSS**
+**1.5 - Styling with CSS**
+
 If you want to build the next unicorn startup, your product needs to look good. That's where styling comes in. For now, we will use regular CSS to customise the way our App looks:
 
 - Change the background colour and height of the View:
@@ -165,7 +166,7 @@ My example code is the following:
 function App() {
   return (
     <View style={{ backgroundColor: 'black', height: '100%' }}>
-      <View style={{ backgroundColor: 'black', height: '100%' }}>
+      <View style={{ margin: '5px' }}>
         <Text style={{ color: 'white' }}>Hey there, mega dev!</Text>
       </View>
     </View>
