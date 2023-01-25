@@ -2,11 +2,9 @@ import { encodeURL, createQR } from '@solana/pay';
 import { FC, useEffect, useRef, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 
-const pizzeriaPubkey = '7aU2utTfmNLxUhcQytiEELFdpZ6HXTdjpEXi6RmLRF8N';
 
 type SupportedSplToken = {
   symbol: string;
-  address: null | string;
   color: string;
   mint?: string;
 };
@@ -14,19 +12,30 @@ type SupportedSplToken = {
 type TransactionRequestQRProps = {
   reference: PublicKey;
   total: number;
+  order: number;
+  pepperoni: number;
+  mushrooms: number;
+  olives: number;
 };
 
-const PayQR: FC<TransactionRequestQRProps> = ({ reference, total }) => {
-  const sol = { symbol: 'SOL', address: null, color: 'green-600', mint: 'SOL' };
+const queryBuilder = (baseUrl: string, params: string[][]) => {
+  let url = baseUrl + '?';
+  params.forEach((p, i) => url += p[0] + '=' + p[1] + (i != params.length - 1 ? '&' : ''));
+  console.log(url)
+  return url;
+}
+
+const PayQR: FC<TransactionRequestQRProps> = (
+  { reference, total, order, pepperoni, mushrooms, olives }
+) => {
+  const sol = { symbol: 'SOL', color: 'green-600', mint: 'SOL' };
   const usdc = {
     symbol: 'USDC',
-    address: '',
     color: 'blue-600',
     mint: 'EvLepoDXhscvLxbTQ7byj3NE6n6gSNJP3DeZx5k49uLm',
   };
   const bonk = {
     symbol: 'BONK',
-    address: '',
     color: 'orange-400',
     mint: 'EvLepoDXhscvLxbTQ7byj3NE6n6gSNJP3DeZx5k49uLm',
   };
@@ -38,11 +47,19 @@ const PayQR: FC<TransactionRequestQRProps> = ({ reference, total }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const apiUrl = `${window.location.protocol}//${
-      window.location.host
-    }/api/transaction?reference=${reference.toBase58()}&amount=${total.toString()}&token=${
-      currentTokenSelection.mint
-    }`;
+    const params = [
+      ['reference', reference.toBase58()],
+      ['amount', (total * 0.001).toString()],
+      ['order', order.toString()],
+      ['pepperoni', pepperoni.toString()],
+      ['mushrooms', mushrooms.toString()],
+      ['olives', olives.toString()],
+    ];
+    if (currentTokenSelection.mint) params.push(['token', currentTokenSelection.mint]);
+    const apiUrl = queryBuilder(
+      `${window.location.protocol}//${window.location.host}/api/transaction`,
+      params,
+    );
     const qr = createQR(
       encodeURL({ link: new URL(apiUrl) }),
       360,
@@ -53,10 +70,10 @@ const PayQR: FC<TransactionRequestQRProps> = ({ reference, total }) => {
       ref.current.innerHTML = '';
       qr.append(ref.current);
     }
-  }, [total, reference, currentTokenSelection]);
+  }, [total, reference, currentTokenSelection, order, pepperoni, mushrooms, olives]);
 
   return (
-    <div className='bg-white shadow-md rounded-2xl w-auto text-center flex flex-col justify-between mx-auto'>
+    <div className='bg-white shadow-md rounded-2xl border-solid border border-black w-auto text-center flex flex-col justify-between mx-auto'>
       <div className='justify-self-start m-2 mt-4'>
         <p>Select an SPL Token to pay with:</p>
         <li className='flex flex-row justify-between mx-10 text-xl my-4'>

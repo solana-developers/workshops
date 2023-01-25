@@ -1,14 +1,13 @@
 import {
-    Connection,
     Keypair,
-    PublicKey,
     sendAndConfirmTransaction,
-    SystemProgram,
     Transaction,
-    TransactionInstruction,
+    TransactionMessage,
+    VersionedTransaction,
 } from '@solana/web3.js';
-import * as borsh from "borsh";
 import { Buffer } from "buffer";
+import { CONNECTION } from '../../src/util/const';
+import { createWriteOrderInstruction, getOrderPublicKey, PizzaOrder } from '../../src/util/order';
 
 
 function loadKeypairFromFile(path: string): Keypair {
@@ -17,68 +16,56 @@ function loadKeypairFromFile(path: string): Keypair {
     )
 };
 
-class Assignable {
-    constructor(properties) {
-        Object.keys(properties).map((key) => {
-            return (this[key] = properties[key]);
-        });
-    };
-};
 
-class PizzaOrder extends Assignable {
-    toBuffer() { return Buffer.from(borsh.serialize(PizzaOrderSchema, this)) }
-    
-    static fromBuffer(buffer: Buffer) {
-        return borsh.deserialize(PizzaOrderSchema, PizzaOrder, buffer);
-    };
-};
-const PizzaOrderSchema = new Map([
-    [ PizzaOrder, { 
-        kind: 'struct', 
-        fields: [ 
-            ['pepperoni', 'u8'], 
-            ['mushrooms', 'u8'], 
-            ['olives', 'u8'], 
-        ],
-    }]
-]);
+describe("Pizza Time!", () => {
 
-
-describe("Account Data!", () => {
-
-    const connection = new Connection(`https://api.devnet.solana.com`, 'confirmed');
     const payer = loadKeypairFromFile(require('os').homedir() + '/.config/solana/id.json');
-    const program = loadKeypairFromFile('./program/target/deploy/pizza_program-keypair.json');
-
-    const pizzaOrderKeypair = Keypair.generate();
+    const order = 1 + Math.floor(Math.random() * 254);
 
     it("Create a pizza order", async () => {
+        
+        console.log(`Order Number       : ${order}`);
+        console.log(`Order PublicKey    : ${getOrderPublicKey(order, payer.publicKey)}`);
         console.log(`Payer Address      : ${payer.publicKey}`);
-        console.log(`Address Info Acct  : ${pizzaOrderKeypair.publicKey}`);
-        let ix = new TransactionInstruction({
-            keys: [
-                {pubkey: pizzaOrderKeypair.publicKey, isSigner: true, isWritable: true},
-                {pubkey: payer.publicKey, isSigner: true, isWritable: true},
-                {pubkey: SystemProgram.programId, isSigner: false, isWritable: false}
-            ],
-            programId: program.publicKey,
-            data: (
-                new PizzaOrder({
-                    pepperoni: 2,
-                    mushrooms: 3,
-                    olives: 1,
-                })
-            ).toBuffer(),
-        });
-        await sendAndConfirmTransaction(
-            connection, 
-            new Transaction().add(ix),
-            [payer, pizzaOrderKeypair]
+
+        // let blockhash = await CONNECTION
+        //     .getLatestBlockhash()
+        //     .then((res) => res.blockhash)
+    
+        // const messageV0 = new TransactionMessage({
+        //     payerKey: payer.publicKey,
+        //     recentBlockhash: blockhash,
+        //     instructions: [await createWriteOrderInstruction(payer.publicKey, new PizzaOrder({
+        //         order,
+        //         pepperoni: 2,
+        //         mushrooms: 1,
+        //         olives: 3,
+        //     }))],
+        // }).compileToV0Message()
+        
+        // const tx = new VersionedTransaction(messageV0)
+        // tx.sign([payer])
+
+        // const sx = await CONNECTION.sendTransaction(tx, {skipPreflight: true});
+
+        // await CONNECTION.confirmTransaction(sx);
+
+        const sx = await sendAndConfirmTransaction(
+            CONNECTION, 
+            new Transaction().add(await createWriteOrderInstruction(payer.publicKey, new PizzaOrder({
+                order,
+                pepperoni: 2,
+                mushrooms: 1,
+                olives: 3,
+            }))),
+            [payer],
+            { skipPreflight: true }
         );
+        await CONNECTION.confirmTransaction(sx);
     });
 
     it("Read the new account's data", async () => {
-        const accountInfo = await connection.getAccountInfo(pizzaOrderKeypair.publicKey);
+        const accountInfo = await CONNECTION.getAccountInfo(getOrderPublicKey(order, payer.publicKey));
         const readPizzaOrder = PizzaOrder.fromBuffer(accountInfo.data);
         console.log(`Pepperoni      : ${readPizzaOrder.pepperoni}`);
         console.log(`Mushrooms      : ${readPizzaOrder.mushrooms}`);
