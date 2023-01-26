@@ -1,0 +1,7 @@
+{
+    "name": "beginner-crash-course",
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "workspaceFolder": "/workspaces/workshops/workshops/beginner-crash-course/starter",
+    "features": {
+    }
+  }
