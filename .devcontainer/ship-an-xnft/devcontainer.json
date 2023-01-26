@@ -1,6 +1,6 @@
 {
     "name": "ship-an-xnft",
-    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "build": { "dockerfile": "../Dockerfile" },
     "workspaceFolder": "/workspaces/workshops/workshops/ship-an-xnft/starter",
     "features": {
     }

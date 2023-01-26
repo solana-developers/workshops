@@ -1,6 +1,6 @@
 {
     "name": "deep-dive-into-programs",
-    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "build": { "dockerfile": "../Dockerfile" },
     "workspaceFolder": "/workspaces/workshops/workshops/deep-dive-into-programs/starter",
     "features": {
     }
