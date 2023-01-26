@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import PayQR from '@/src/components/PayQR';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import { findReference, FindReferenceError } from '@solana/pay';
-import { PizzaOrder, displayOnChainPizzaOrder } from '@/src/util/order';
+import { PizzaOrder, displayOnChainPizzaOrder, getOrderPublicKey } from '@/src/util/order';
 import { CONNECTION } from '@/src/util/const';
 
 
@@ -20,8 +20,7 @@ export default function Home() {
   const [orderNumber, setOrderNumber] = useState<number>();
 
   const [orderPublicKey, setOrderPublicKey] = useState<PublicKey>();
-  // const [onChainOrderDetails, setOnChainOrderDetails] = useState<PizzaOrder>();
-  const [onChainOrderDetails, setOnChainOrderDetails] = useState<boolean>(false);
+  const [onChainOrderDetails, setOnChainOrderDetails] = useState<PizzaOrder>();
 
   const addAddon = (addon: PizzaOrderType) => {
     if (pizzaOrder) {
@@ -66,12 +65,24 @@ export default function Home() {
     const interval = setInterval(async () => {
       try {
         // Check if there is any transaction for the reference
-        if (reference) {
+        if (reference && orderNumber) {
           const signatureInfo = await findReference(CONNECTION, reference);
           // do something here when the transaction is confirmed
           console.log('Transaction confirmed', signatureInfo);
-          // setOnChainOrderDetails(await displayOnChainPizzaOrder(CONNECTION, orderPublicKey))
-          setOnChainOrderDetails(true)
+          const parsedSender = (
+            await CONNECTION.getParsedTransaction(signatureInfo.signature)
+          )?.transaction.message.accountKeys.filter((key) => key.signer)[0];
+          if (parsedSender) {
+            const orderPublicKey = getOrderPublicKey(
+              orderNumber, 
+              parsedSender.pubkey
+            );
+            setOrderPublicKey(orderPublicKey);
+            setOnChainOrderDetails(await displayOnChainPizzaOrder(
+              CONNECTION, 
+              orderPublicKey,
+            ));
+          }
         }
       } catch (e) {
         if (e instanceof FindReferenceError) {
@@ -85,7 +96,7 @@ export default function Home() {
     return () => {
       clearInterval(interval);
     };
-  }, [orderPublicKey, reference]);
+  }, [orderNumber, orderPublicKey, reference]);
 
   return (
     <main className='min-h-screen bg-red-500 p-2'>
@@ -107,28 +118,26 @@ export default function Home() {
                       className='my-2 flex flex-row justify-center mx-16 text-lg'
                     >
                       <p className='font-bold'>Pepperoni</p>
-                      <p className='font-bold ml-auto text-red-600'>{pizzaOrder.pepperoni}</p>
+                      <p className='font-bold ml-auto text-red-600'>{onChainOrderDetails.pepperoni}</p>
                     </li>
                     <li
                       className='my-2 flex flex-row justify-left mx-16 text-lg'
                     >
                       <p className='font-bold'>Mushrooms</p>
-                      <p className='font-bold ml-auto text-red-600'>{pizzaOrder.mushrooms}</p>
+                      <p className='font-bold ml-auto text-red-600'>{onChainOrderDetails.mushrooms}</p>
                     </li>
                     <li
                       className='my-2 flex flex-row justify-left mx-16 text-lg'
                     >
                       <p className='font-bold'>Olives</p>
-                      <p className='font-bold ml-auto text-red-600'>{pizzaOrder.olives}</p>
+                      <p className='font-bold ml-auto text-red-600'>{onChainOrderDetails.olives}</p>
                     </li>
                   </ul>
                 </div>
                 <p className='text-sm text-gray-700 mt-6 mx-auto'>
                   On-Chain Address :
                 </p>
-                <p className='text-sm mt-2 mx-auto'>
-                  Fv11UeEBGd2PgMV87rm8Ugx9mMBA71vVYwdcXEGSH3jP
-                </p>
+                <p className='text-sm mt-2 mx-auto'>{orderPublicKey?.toBase58()}</p>
               </div>
             </div>
             :
