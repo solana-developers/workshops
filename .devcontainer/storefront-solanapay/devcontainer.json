@@ -1,0 +1,7 @@
+{
+    "name": "storefront-solanapay",
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "workspaceFolder": "/workspaces/workshops/workshops/storefront-solanapay/starter",
+    "features": {
+    }
+  }
