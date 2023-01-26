@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/universal:2
+FROM frolvlad/alpine-glibc
 
 RUN apk update && apk upgrade -a &&\
     apk add --update bash build-base wget curl nodejs npm eudev-dev &&\
