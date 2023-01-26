@@ -1,5 +1,5 @@
 {
-    "name": "beginner-crash-course",
+    "name": "ship-an-xnft",
     "image": "mcr.microsoft.com/devcontainers/universal:2",
     "workspaceFolder": "/workspaces/workshops/workshops/ship-an-xnft/starter",
     "features": {

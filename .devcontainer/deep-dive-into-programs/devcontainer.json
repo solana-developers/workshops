@@ -1,5 +1,5 @@
 {
-    "name": "beginner-crash-course",
+    "name": "deep-dive-into-programs",
     "image": "mcr.microsoft.com/devcontainers/universal:2",
     "workspaceFolder": "/workspaces/workshops/workshops/deep-dive-into-programs/starter",
     "features": {
