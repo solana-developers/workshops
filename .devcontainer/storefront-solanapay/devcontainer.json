@@ -1,6 +1,6 @@
 {
     "name": "storefront-solanapay",
-    "build": { "dockerfile": "../Dockerfile" },
+    "image": "docker.io/solanadevelopers/solana-workshop-image",
     "workspaceFolder": "/workspaces/workshops/workshops/storefront-solanapay/starter",
     "features": {
     }

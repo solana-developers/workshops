@@ -1,7 +1,7 @@
 FROM ubuntu
 
 RUN apt update && apt upgrade -y
-RUN apt install -y bash bzip2 wget curl libssl-dev
+RUN apt install -y bash bzip2 wget curl gcc-multilib libssl-dev
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 RUN npm i -g yarn

@@ -1,6 +1,6 @@
 {
     "name": "deep-dive-into-programs",
-    "build": { "dockerfile": "../Dockerfile" },
+    "image": "docker.io/solanadevelopers/solana-workshop-image",
     "workspaceFolder": "/workspaces/workshops/workshops/deep-dive-into-programs/starter",
     "features": {
     }
