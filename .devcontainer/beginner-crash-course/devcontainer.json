@@ -1,6 +1,6 @@
 {
     "name": "beginner-crash-course",
-    "image": "docker.io/solanadevelopers/solana-workshop-image:0.0.1",
+    "image": "docker.io/solanadevelopers/solana-workshop-image:0.0.2",
     "workspaceFolder": "/workspaces/workshops/workshops/beginner-crash-course/starter",
     "features": {
     }

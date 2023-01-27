@@ -1,8 +1,11 @@
 FROM ubuntu
 
 RUN apt update && apt upgrade -y
-RUN apt install -y bash wget curl nodejs npm libssl-dev
+RUN apt install -y bash bzip2 wget curl libssl-dev
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
 RUN npm i -g yarn
+RUN apt update && apt upgrade -y
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -q
 RUN wget http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
 RUN dpkg -i libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
