@@ -67,7 +67,7 @@ Now, go into the settings and enable the developer mode.
 
 **1.2 - Create your first xNFT**
 
-Run the command `git clone https://github.com/coral-xyz/xnft-quickstart.git my-project`. Then run `cd my-project`.
+Run the command `https://github.com/valentinmadrid/xnft-quickstart.git my-project`. Then run `cd my-project`.
 
 **1.3 - Test your xNFT**
 
