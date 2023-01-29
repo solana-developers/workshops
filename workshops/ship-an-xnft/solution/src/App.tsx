@@ -9,6 +9,12 @@ import FriendsScreen from './screens/FriendsScreen';
 
 const Tab = createBottomTabNavigator();
 
+declare global {
+  interface Window {
+    xnft: any;
+  }
+}
+
 function App() {
   function TabNavigator() {
     return (

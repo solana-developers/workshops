@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function FriendsScreen() {
   const [addFriend, setAddFriend] = useState({ name: '', pubkey: '' });
-  const [friends, setFriends] = useState<any>();
+  const [friends, setFriends] = useState<any>([]);
 
   useEffect(() => {
     const getFriends = async () => {
@@ -21,6 +21,11 @@ function FriendsScreen() {
   const addFriendToLS = () => {
     AsyncStorage.setItem('friends', JSON.stringify([...friends, addFriend]));
     setAddFriend({ name: '', pubkey: '' });
+  };
+
+  const removeAllFriends = () => {
+    AsyncStorage.removeItem('friends');
+    setFriends([]);
   };
 
   return (
@@ -45,6 +50,13 @@ function FriendsScreen() {
           title='Add Friend'
           color='black'
           onPress={() => addFriendToLS()}
+        />
+      </View>
+      <View style={tw`m-5`}>
+        <Button
+          title='Remove Friends'
+          color='black'
+          onPress={() => removeAllFriends()}
         />
       </View>
     </View>
