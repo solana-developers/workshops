@@ -4,8 +4,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import HomeScreen from './screens/HomeScreen';
-import FriendsScreen from './screens/FriendsScreen';
+import HomeScreen from './screens/FriendsScreen';
+import FriendsScreen from './screens/HomeScreen';
 
 const Tab = createBottomTabNavigator();
 
