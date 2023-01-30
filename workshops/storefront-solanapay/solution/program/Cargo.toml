@@ -1,0 +1,12 @@
+[package]
+name = "pizza-program"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+borsh = "0.10.0"
+borsh-derive = "0.10.0"
+solana-program = "1.14.13"

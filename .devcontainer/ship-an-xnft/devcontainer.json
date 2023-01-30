@@ -1,0 +1,7 @@
+{
+    "name": "ship-an-xnft",
+    "image": "docker.io/solanadevelopers/solana-workshop-image:0.0.1",
+    "workspaceFolder": "/workspaces/workshops/workshops/ship-an-xnft/starter",
+    "features": {
+    }
+  }

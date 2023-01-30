@@ -1,105 +1,202 @@
-"use client" // this makes next know that this page should be rendered in the client
-import { useState } from "react"
-import Image from 'next/image'
-import PayQR from "@/src/components/PayQR"
+'use client'; // this makes next know that this page should be rendered in the client
+import { useEffect, useState } from 'react';
+import PayQR from '@/src/components/PayQR';
+import { Keypair, PublicKey } from '@solana/web3.js';
+import { findReference, FindReferenceError } from '@solana/pay';
+import { PizzaOrder, displayOnChainPizzaOrder, getOrderPublicKey } from '@/src/util/order';
+import { CONNECTION } from '@/src/util/const';
+
+
+type PizzaOrderType = {
+  pepperoni: number,
+  mushrooms: number,
+  olives: number,
+}
 
 export default function Home() {
-  const [pizzaScreen, setPizzaScreen] = useState(true)
-  const [pizzaAddons, setPizzaAddons] = useState(
-    [
-      {
-        name: "Pepperoni",
-        amount: 0,
+  const [pizzaOrder, setPizzaOrder] = useState<PizzaOrderType>()
+  const [total, setTotal] = useState(0);
+  const [reference, setReference] = useState<PublicKey>();
+  const [orderNumber, setOrderNumber] = useState<number>();
 
-      },
-      {
-        name: "Mushrooms",
-        amount: 0,
-      },
-      {
-        name: "Olives",
-        amount: 0,
-      }
-  ]
-  )
+  const [orderPublicKey, setOrderPublicKey] = useState<PublicKey>();
+  const [onChainOrderDetails, setOnChainOrderDetails] = useState<PizzaOrder>();
 
-  const addonPricings = {
-    Pepperoni: 0.5,
-    Mushrooms: 0.25,
-    Olives: 0.25
-  }
-
- const [ total, setTotal ] = useState(0)
-
-
-
-  const addAddon = (addonName:string) => {
-    // when this function is called, add 1 to the amount of the addon that was clicked and update the total
-    const newPizzaAddons = pizzaAddons.map((addon) => {
-      if (addon.name === addonName) {
-        addon.amount += 1
-      }
-      return addon
+  const addAddon = (addon: PizzaOrderType) => {
+    if (pizzaOrder) {
+      setPizzaOrder(addon)
+      setTotal(total + 0.5)
     }
-    )
-    setPizzaAddons(newPizzaAddons)
-    setTotal(total + addonPricings[addonName])
+  };
 
-  }
+  const subtractPepperoni = () => {
+    if (pizzaOrder && pizzaOrder.pepperoni != 0) { 
+      setPizzaOrder({ ...pizzaOrder, pepperoni: pizzaOrder.pepperoni -= 1})
+      setTotal(total - 0.5)
+    }
+  };
+  const subtractMushrooms = () => {
+    if (pizzaOrder && pizzaOrder.pepperoni != 0) { 
+      setPizzaOrder({ ...pizzaOrder, mushrooms: pizzaOrder.mushrooms -= 1})
+      setTotal(total - 0.5)
+    }
+  };
+  const subtractOlives = () => {
+    if (pizzaOrder && pizzaOrder.pepperoni != 0) { 
+      setPizzaOrder({ ...pizzaOrder, olives: pizzaOrder.olives -= 1})
+      setTotal(total - 0.5)
+    }
+  };
+
+
+  useEffect(() => {
+    setReference(Keypair.generate().publicKey);
+    const randomOrderNumber = Math.floor(Math.random() * 255);
+    setOrderNumber(randomOrderNumber);
+    setPizzaOrder(new PizzaOrder({
+      order: randomOrderNumber,
+      pepperoni: 0,
+      mushrooms: 0,
+      olives: 0,
+    }));
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        // Check if there is any transaction for the reference
+        if (reference && orderNumber) {
+          const signatureInfo = await findReference(CONNECTION, reference);
+          // do something here when the transaction is confirmed
+          console.log('Transaction confirmed', signatureInfo);
+          const parsedSender = (
+            await CONNECTION.getParsedTransaction(signatureInfo.signature)
+          )?.transaction.message.accountKeys.filter((key) => key.signer)[0];
+          if (parsedSender) {
+            const orderPublicKey = getOrderPublicKey(
+              orderNumber, 
+              parsedSender.pubkey
+            );
+            setOrderPublicKey(orderPublicKey);
+            setOnChainOrderDetails(await displayOnChainPizzaOrder(
+              CONNECTION, 
+              orderPublicKey,
+            ));
+          }
+        }
+      } catch (e) {
+        if (e instanceof FindReferenceError) {
+          console.log('No transaction found for the reference');
+          return;
+        }
+        console.error('Unknown error', e);
+      }
+    }, 500);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [orderNumber, orderPublicKey, reference]);
 
   return (
-    // a main component for a pizza shop with a funny and playful background design in tailwindcss
-    <main className="min-h-screen bg-red-500 p-2">
-        <h1 className="text-4xl font-bold text-center">Pizza Shop</h1>
-{pizzaScreen ? (
-        <div className="flex flex-col md:flex-row justify-center">
-          <div className="w-full md:w-1/2">
-            <div className="bg-white shadow-md rounded-2xl my-6 mr-2 overflow-hidden">
-              <Image width={1000} height={1000} className="w-full" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80" alt="Pizza" />
-              <div className="text-center px-3 pb-6 pt-2">
-                <h1 className="text-xl font-bold">Pizza</h1>
-                <p className="text-sm text-gray-600">A delicious pizza with the following ingredients:</p>
-                <ul className="text-sm text-gray-600">
-                  {pizzaAddons.map((addon) => (
-                    <li key={addon.name}>{addon.name} x {addon.amount}</li>
-                  ))}
-                </ul>
-                <h2>Total amount : {total}€</h2>
-                <button onClick={() => setPizzaScreen(false)} className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full my-3">
-                  Proceed to Payment
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="w-full md:w-1/2">
-            <div className="bg-white shadow-md rounded-2xl my-6 ml-2">
-              <div className="text-center px-3 pb-6 pt-2">
-                <h1 className="text-xl font-bold">Addons</h1>
-                <p className="text-sm text-gray-600">Add some extra ingredients to your pizza:</p>
-                <ul className="text-sm text-gray-600">
-                  {pizzaAddons.map((addon) => (
-                    <li key={addon.name}>
-                      <button className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full my-3" onClick={() => addAddon(addon.name)}>
-                        {addon.name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-) : (
-        <div className="flex flex-col h-screen my-auto items-center bgimg bg-cover">
-          
-          <PayQR />
-          <button onClick={() => setPizzaScreen(true)} className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full my-3">
-            Edit Order
-          </button>
-          </div>
-)}
-    </main>
-  
+    <main className='min-h-screen bg-red-500 p-2'>
+      { pizzaOrder && <div className="w-full min-h-screen bg-no-repeat bg-cover bg-center bg-fixed bg-[url('../public/pizzeria.jpg')]">
+        <div className="w-full min-h-screen bg-no-repeat bg-cover bg-center bg-fixed bg-red-900 bg-opacity-60 pt-4">
+          {onChainOrderDetails ? 
 
-  )
+            <div className='bg-white shadow-md rounded-2xl border-solid border border-black mx-auto w-fit p-2'>
+              <div className='text-center px-3 pb-6 pt-2'>
+                <h2 className='my-8 text-2xl'>
+                  Confirmed!{' '}
+                </h2>
+                <p className='text-sm text-gray-700 my-4'>
+                  Your Order :
+                </p>
+                <div className='text-center mx-auto w-96'>
+                  <ul className='text-sm text-gray-600'>
+                    <li
+                      className='my-2 flex flex-row justify-center mx-16 text-lg'
+                    >
+                      <p className='font-bold'>Pepperoni</p>
+                      <p className='font-bold ml-auto text-red-600'>{onChainOrderDetails.pepperoni}</p>
+                    </li>
+                    <li
+                      className='my-2 flex flex-row justify-left mx-16 text-lg'
+                    >
+                      <p className='font-bold'>Mushrooms</p>
+                      <p className='font-bold ml-auto text-red-600'>{onChainOrderDetails.mushrooms}</p>
+                    </li>
+                    <li
+                      className='my-2 flex flex-row justify-left mx-16 text-lg'
+                    >
+                      <p className='font-bold'>Olives</p>
+                      <p className='font-bold ml-auto text-red-600'>{onChainOrderDetails.olives}</p>
+                    </li>
+                  </ul>
+                </div>
+                <p className='text-sm text-gray-700 mt-6 mx-auto'>
+                  On-Chain Address :
+                </p>
+                <p className='text-sm mt-2 mx-auto'>{orderPublicKey?.toBase58()}</p>
+              </div>
+            </div>
+            :
+            <div className='flex flex-col justify-center'>
+
+              {/* Order Builder */}
+              <div className='bg-white shadow-md rounded-2xl border-solid border border-black mx-auto w-fit p-2 mb-2'>
+                <div className='text-center px-3 pb-6 pt-2'>
+                  <p className='text-sm text-gray-700 my-4'>
+                    One delicious pizza with the following ingredients:
+                  </p>
+                  <ul className='text-sm text-gray-600'>
+                    <li className='my-2 flex flex-row justify-left mx-10 text-lg'>
+                      <p className='font-bold'>Pepperoni</p>
+                      <p className='font-bold ml-auto text-red-600'>{pizzaOrder.pepperoni}</p>
+                      <button className='ml-6' onClick={() => addAddon({ ...pizzaOrder, pepperoni: pizzaOrder.pepperoni += 1})}><span>+</span></button>
+                      <button
+                        className='ml-4 mr-4'
+                        onClick={() => subtractPepperoni()}><span>-</span></button>
+                    </li>
+                    <li className='my-2 flex flex-row justify-left mx-10 text-lg'>
+                      <p className='font-bold'>Mushrooms</p>
+                      <p className='font-bold ml-auto text-red-600'>{pizzaOrder?.mushrooms}</p>
+                      <button className='ml-6' onClick={() => addAddon({ ...pizzaOrder, mushrooms: pizzaOrder.mushrooms += 1})}><span>+</span></button>
+                      <button
+                        className='ml-4 mr-4'
+                        onClick={() => subtractMushrooms()}><span>-</span></button>
+                    </li>
+                    <li className='my-2 flex flex-row justify-left mx-10 text-lg'>
+                      <p className='font-bold'>Olives</p>
+                      <p className='font-bold ml-auto text-red-600'>{pizzaOrder?.olives}</p>
+                      <button className='ml-6' onClick={() => addAddon({ ...pizzaOrder, olives: pizzaOrder.olives += 1})}><span>+</span></button>
+                      <button
+                        className='ml-4 mr-4'
+                        onClick={() => subtractOlives()}><span>-</span></button>
+                    </li>
+                  </ul>
+                  <h2 className='mt-8 text-2xl'>
+                    Order Total :{' '}
+                    <span className='front-heavy text-blue-600'>{total}€</span>
+                  </h2>
+                </div>
+              </div>
+
+              {/* Pay QR */}
+              {total != 0 && reference && orderNumber && pizzaOrder && (
+                <PayQR 
+                reference={reference} 
+                total={total}
+                order={orderNumber}
+                pepperoni={pizzaOrder.pepperoni}
+                mushrooms={pizzaOrder.mushrooms}
+                olives={pizzaOrder.olives}
+              />
+              )}
+            </div>
+          }
+        </div>
+      </div>}
+    </main>
+  );
 }

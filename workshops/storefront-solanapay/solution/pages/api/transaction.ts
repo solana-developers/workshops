@@ -1,25 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import {
-  clusterApiUrl,
-  Connection,
-  Keypair,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-} from '@solana/web3.js';
-import BigNumber from 'bignumber.js';
-import {
-  createTransferCheckedInstruction,
-  getAccount,
-  getAssociatedTokenAddress,
-  getMint,
-} from '@solana/spl-token';
-
-const MERCHANT_WALLET = new PublicKey(
-  'va1yPZsd2qieP5pE6gtxvAHkHKEW3qmtoZy3oN1GcBX'
-);
-const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+import { PublicKey, Transaction } from '@solana/web3.js';
+import { createWriteOrderInstruction, PizzaOrder } from '@/src/util/order';
+import { createTransferTokenInstruction } from '@/src/util/transfer';
+import { CONNECTION } from '@/src/util/const';
 
 type POST = {
   transaction: string;
@@ -30,6 +14,21 @@ type GET = {
   label: string;
   icon: string;
 };
+
+function getFromPayload(req: NextApiRequest, payload: string, field: string): string {
+  function parseError() { throw new Error(`${payload} parse error: missing ${field}`) };
+  let value;
+  if (payload === 'Query') {
+    if (!(field in req.query)) parseError();
+    value = req.query[field];
+  }
+  if (payload === 'Body') {
+    if (!req.body || !(field in req.body)) parseError();
+    value = req.body[field];
+  }
+  if (value === undefined || value.length === 0) parseError();
+  return typeof value === 'string' ? value : value[0];
+}
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -53,27 +52,27 @@ const get = async (req: NextApiRequest, res: NextApiResponse<GET>) => {
 };
 
 const post = async (req: NextApiRequest, res: NextApiResponse<POST>) => {
-  // Account provided in the transaction request body by the wallet.
-  const accountField = req.body?.account;
-  if (!accountField) throw new Error('missing account');
+
+  const accountField = getFromPayload(req, 'Body', 'account');
+  const referenceField = getFromPayload(req, 'Query', 'reference');
+  const amountField = getFromPayload(req, 'Query', 'amount');
+  const token = getFromPayload(req, 'Query', 'token');
+  const order = Number.parseInt(getFromPayload(req, 'Query', 'order'));
+  const pepperoni = Number.parseInt(getFromPayload(req, 'Query', 'pepperoni'));
+  const mushrooms = Number.parseInt(getFromPayload(req, 'Query', 'mushrooms'));
+  const olives = Number.parseInt(getFromPayload(req, 'Query', 'olives'));
 
   const sender = new PublicKey(accountField);
+  const reference = new PublicKey(referenceField);
+  const amount = Number.parseInt(amountField);
 
-  // create spl transfer instruction
-  const solTransfer = await SystemProgram.transfer({
-    fromPubkey: sender,
-    toPubkey: MERCHANT_WALLET,
-    lamports: 1000000000,
-  });
-
-  // create the transaction
   const transaction = new Transaction();
-  const latestBlockhash = await connection.getLatestBlockhash();
+  const latestBlockhash = await CONNECTION.getLatestBlockhash();
   transaction.feePayer = sender;
   transaction.recentBlockhash = latestBlockhash.blockhash;
 
-  // add the instruction to the transaction
-  transaction.add(solTransfer);
+  transaction.add(await createTransferTokenInstruction(CONNECTION, sender, reference, token, amount));
+  transaction.add(await createWriteOrderInstruction(sender, new PizzaOrder({ order, pepperoni, mushrooms, olives })));
 
   // Serialize and return the unsigned transaction.
   const serializedTransaction = transaction.serialize({
@@ -82,7 +81,7 @@ const post = async (req: NextApiRequest, res: NextApiResponse<POST>) => {
   });
 
   const base64Transaction = serializedTransaction.toString('base64');
-  const message = 'Thanks for buying a Solami!';
+  const message = 'Thanks for buying a Solami pizza!';
 
   res.status(200).send({ transaction: base64Transaction, message });
 };
