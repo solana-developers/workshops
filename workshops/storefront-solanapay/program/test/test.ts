@@ -6,8 +6,8 @@ import {
     VersionedTransaction,
 } from '@solana/web3.js';
 import { Buffer } from "buffer";
-import { CONNECTION } from '../../src/util/const';
-import { createWriteOrderInstruction, getOrderPublicKey, PizzaOrder } from '../../src/util/order';
+import { CONNECTION } from '../../solution/src/util/const';
+import { createWriteOrderInstruction, getOrderPublicKey, PizzaOrder } from '../../solution/src/util/order';
 
 
 function loadKeypairFromFile(path: string): Keypair {
