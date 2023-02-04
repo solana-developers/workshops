@@ -1,11 +1,11 @@
 import { encodeURL, createQR } from '@solana/pay';
 import { FC, useEffect, useRef, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
+import { SIMULATED_BONK_MINT, SIMULATED_USDC_MINT } from '../util/const';
 
 
 type SupportedSplToken = {
   symbol: string;
-  color: string;
   mint?: string;
 };
 
@@ -28,21 +28,8 @@ const queryBuilder = (baseUrl: string, params: string[][]) => {
 const PayQR: FC<TransactionRequestQRProps> = (
   { reference, total, order, pepperoni, mushrooms, olives }
 ) => {
-  const sol = { symbol: 'SOL', color: 'green-600', mint: 'SOL' };
-  const usdc = {
-    symbol: 'USDC',
-    color: 'blue-600',
-    mint: 'EvLepoDXhscvLxbTQ7byj3NE6n6gSNJP3DeZx5k49uLm',
-  };
-  const bonk = {
-    symbol: 'BONK',
-    color: 'orange-400',
-    mint: 'EvLepoDXhscvLxbTQ7byj3NE6n6gSNJP3DeZx5k49uLm',
-  };
-  const availableTokens: SupportedSplToken[] = [sol, usdc, bonk];
-
   const [currentTokenSelection, setCurrentTokenSelection] =
-    useState<SupportedSplToken>(sol);
+    useState<SupportedSplToken>({ symbol: 'SOL', mint: 'SOL' });
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -77,28 +64,33 @@ const PayQR: FC<TransactionRequestQRProps> = (
       <div className='justify-self-start m-2 mt-4'>
         <p>Select an SPL Token to pay with:</p>
         <li className='flex flex-row justify-between mx-10 text-xl my-4'>
-          {availableTokens.map((token) => {
-            return (
-              <button
-                key={token.symbol}
-                className={`rounded-lg border-solid border border-gray-500 bg-${
-                  token.color
-                } p-2 bg-opacity-${
-                  currentTokenSelection.symbol === token.symbol ? 20 : 60
-                }`}
-                onClick={() => setCurrentTokenSelection(token)}
-                disabled={currentTokenSelection.symbol === token.symbol}
-              >
-                {token.symbol}
-              </button>
-            );
-          })}
+          <button
+            className={`rounded-lg border-solid border border-gray-500 bg-green-600 p-2 bg-opacity-${currentTokenSelection.symbol === 'SOL' ? 20 : 60}`}
+            onClick={() => setCurrentTokenSelection({ symbol: 'SOL', mint: 'SOL' })}
+            disabled={currentTokenSelection.symbol === 'SOL'}
+          >
+            SOL
+          </button>
+          <button
+            className={`rounded-lg border-solid border border-gray-500 bg-blue-600 p-2 bg-opacity-${currentTokenSelection.symbol === 'USDC' ? 20 : 60}`}
+            onClick={() => setCurrentTokenSelection({ symbol: 'USDC', mint: SIMULATED_USDC_MINT })}
+            disabled={currentTokenSelection.symbol === 'USDC'}
+          >
+            USDC
+          </button>
+          <button
+            className={`rounded-lg border-solid border border-gray-500 bg-orange-400 p-2 bg-opacity-${currentTokenSelection.symbol === 'BONK' ? 20 : 60}`}
+            onClick={() => setCurrentTokenSelection({ symbol: 'BONK', mint: SIMULATED_BONK_MINT })}
+            disabled={currentTokenSelection.symbol === 'BONK'}
+          >
+            BONK
+          </button>
         </li>
         {currentTokenSelection && (
           <p className='my-auto'>
             Current selection:{' '}
             <span
-              className={`font-bold text-xl text-${currentTokenSelection.color}`}
+              className={`font-bold text-xl`}
             >
               {currentTokenSelection.symbol}
             </span>
