@@ -235,17 +235,17 @@ async function tokensScript() {
     await createToken(
         tokenMintKeypair, 
         9,
-        "My Token",
-        "MYTKN",
-        "https://raw.githubusercontent.com/solana-developers/workshops/main/workshops/beginner-crash-course/client-examples/assets/my-token.json"
+        "Solana Gold",
+        "SGOLD",
+        "https://raw.githubusercontent.com/solana-developers/workshops/main/workshops/beginner-crash-course/solution/client-examples/assets/my-token.json"
     )
     // NFT
     await createToken(
         nftMintKeypair, 
         0,
-        "My NFT",
-        "MYNFT",
-        "https://raw.githubusercontent.com/solana-developers/workshops/main/workshops/beginner-crash-course/client-examples/assets/my-nft.json"
+        "Homer NFT",
+        "HOMR",
+        "https://raw.githubusercontent.com/solana-developers/workshops/main/workshops/beginner-crash-course/solution/client-examples/assets/my-nft.json"
     )
 
     await mintToWallet(
