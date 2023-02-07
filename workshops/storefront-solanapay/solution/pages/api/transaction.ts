@@ -2,8 +2,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PublicKey, Transaction } from '@solana/web3.js';
 import { createWriteOrderInstruction, PizzaOrder } from '@/src/util/order';
-import { createTransferTokenInstruction } from '@/src/util/transfer';
-import { CONNECTION } from '@/src/util/const';
+import { CONNECTION, MERCHANT_WALLET } from '@/src/util/const';
+import { createTransfer } from '@solana/pay';
+import BigNumber from 'bignumber.js';
 
 type POST = {
   transaction: string;
@@ -53,6 +54,8 @@ const get = async (req: NextApiRequest, res: NextApiResponse<GET>) => {
 
 const post = async (req: NextApiRequest, res: NextApiResponse<POST>) => {
 
+  const message = 'Thanks for buying a Solami pizza!';
+
   const accountField = getFromPayload(req, 'Body', 'account');
   const referenceField = getFromPayload(req, 'Query', 'reference');
   const amountField = getFromPayload(req, 'Query', 'amount');
@@ -71,7 +74,14 @@ const post = async (req: NextApiRequest, res: NextApiResponse<POST>) => {
   transaction.feePayer = sender;
   transaction.recentBlockhash = latestBlockhash.blockhash;
 
-  transaction.add(await createTransferTokenInstruction(CONNECTION, sender, reference, token, amount));
+  const transferConfig = { 
+    recipient: MERCHANT_WALLET, 
+    amount: new BigNumber(amount),
+    splToken: token === 'SOL' ? undefined : new PublicKey(token),
+    reference,
+    memo: message,
+  };
+  transaction.add(await createTransfer(CONNECTION, sender, transferConfig));
   transaction.add(await createWriteOrderInstruction(sender, new PizzaOrder({ order, pepperoni, mushrooms, olives })));
 
   // Serialize and return the unsigned transaction.
@@ -81,7 +91,6 @@ const post = async (req: NextApiRequest, res: NextApiResponse<POST>) => {
   });
 
   const base64Transaction = serializedTransaction.toString('base64');
-  const message = 'Thanks for buying a Solami pizza!';
 
   res.status(200).send({ transaction: base64Transaction, message });
 };

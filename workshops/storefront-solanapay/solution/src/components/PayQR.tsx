@@ -21,7 +21,6 @@ type TransactionRequestQRProps = {
 const queryBuilder = (baseUrl: string, params: string[][]) => {
   let url = baseUrl + '?';
   params.forEach((p, i) => url += p[0] + '=' + p[1] + (i != params.length - 1 ? '&' : ''));
-  console.log(url)
   return url;
 }
 
@@ -47,6 +46,7 @@ const PayQR: FC<TransactionRequestQRProps> = (
       `${window.location.protocol}//${window.location.host}/api/transaction`,
       params,
     );
+    console.log(`TOKEN: ${currentTokenSelection.symbol}`)
     const qr = createQR(
       encodeURL({ link: new URL(apiUrl) }),
       360,
