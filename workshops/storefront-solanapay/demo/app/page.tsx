@@ -144,6 +144,9 @@ export default function Home() {
             <div className='flex flex-col justify-center'>
 
               {/* Order Builder */}
+              <div className='bg-white shadow-md rounded-xl border-solid border border-black mx-auto w-fit p-2 mb-2'>
+                <h4 className='text-xl text-slate-700'>Valentin&apos;s Pizza Shop</h4>
+              </div>
               <div className='bg-white shadow-md rounded-2xl border-solid border border-black mx-auto w-fit p-2 mb-2'>
                 <div className='text-center px-3 pb-6 pt-2'>
                   <p className='text-sm text-gray-700 my-4'>
