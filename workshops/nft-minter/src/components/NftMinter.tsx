@@ -3,6 +3,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useNetworkConfiguration } from "contexts/NetworkConfigurationProvider";
 import Image from "next/image";
 import { FC, useCallback, useState } from "react";
+import { mintWithMetaplexJs, mintWithMplTokenMetadata } from "utils/minter";
 import { notify } from "utils/notifications";
 
 const TOKEN_NAME = "Solana Workshop NFT";
@@ -41,24 +42,26 @@ export const NftMinter: FC = () => {
             notify({ type: 'error', message: 'error', description: 'Wallet not connected!' });
             return;
         }
-        const metaplex = Metaplex.make(connection)
-            .use(walletAdapterIdentity(wallet))
-            .use(bundlrStorage({ address: `https://${networkConfiguration}.bundlr.network` }));
-        const { uri } = await metaplex.nfts().uploadMetadata({
-            name: TOKEN_NAME,
-            symbol: TOKEN_SYMBOL,
-            description: TOKEN_DESCRIPTION,
-            image: createObjectURL,
-        });
-        const { mintAddress, response } = await metaplex.nfts().create({
-            name: TOKEN_NAME,
-            uri: uri,
-            sellerFeeBasisPoints: 0,
-            tokenOwner: wallet.publicKey,
-            mintTokens: true,
-        });
-        setMintAddress(mintAddress.toBase58());
-        setMintSignature(response.signature);
+        const [mintAddress, signature] = await mintWithMplTokenMetadata(
+            connection,
+            networkConfiguration,
+            wallet,
+            TOKEN_NAME,
+            TOKEN_SYMBOL,
+            TOKEN_DESCRIPTION,
+            createObjectURL,
+        );
+        // const [mintAddress, signature] = await mintWithMetaplexJs(
+        //     connection,
+        //     networkConfiguration,
+        //     wallet,
+        //     TOKEN_NAME,
+        //     TOKEN_SYMBOL,
+        //     TOKEN_DESCRIPTION,
+        //     createObjectURL,
+        // );
+        setMintAddress(mintAddress);
+        setMintSignature(signature);
     }, [wallet, connection, networkConfiguration, createObjectURL]);
 
     return (
