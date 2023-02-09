@@ -30,20 +30,20 @@ export default function Home() {
   };
 
   const subtractPepperoni = () => {
-    if (pizzaOrder && pizzaOrder.pepperoni != 0) { 
-      setPizzaOrder({ ...pizzaOrder, pepperoni: pizzaOrder.pepperoni -= 1})
+    if (pizzaOrder && pizzaOrder.pepperoni != 0) {
+      setPizzaOrder({ ...pizzaOrder, pepperoni: pizzaOrder.pepperoni -= 1 })
       setTotal(total - 0.5)
     }
   };
   const subtractMushrooms = () => {
-    if (pizzaOrder && pizzaOrder.pepperoni != 0) { 
-      setPizzaOrder({ ...pizzaOrder, mushrooms: pizzaOrder.mushrooms -= 1})
+    if (pizzaOrder && pizzaOrder.pepperoni != 0) {
+      setPizzaOrder({ ...pizzaOrder, mushrooms: pizzaOrder.mushrooms -= 1 })
       setTotal(total - 0.5)
     }
   };
   const subtractOlives = () => {
-    if (pizzaOrder && pizzaOrder.pepperoni != 0) { 
-      setPizzaOrder({ ...pizzaOrder, olives: pizzaOrder.olives -= 1})
+    if (pizzaOrder && pizzaOrder.pepperoni != 0) {
+      setPizzaOrder({ ...pizzaOrder, olives: pizzaOrder.olives -= 1 })
       setTotal(total - 0.5)
     }
   };
@@ -74,12 +74,11 @@ export default function Home() {
           )?.transaction.message.accountKeys.filter((key) => key.signer)[0];
           if (parsedSender) {
             const orderPublicKey = getOrderPublicKey(
-              orderNumber, 
+              orderNumber,
               parsedSender.pubkey
             );
             setOrderPublicKey(orderPublicKey);
             setOnChainOrderDetails(await displayOnChainPizzaOrder(
-              CONNECTION, 
               orderPublicKey,
             ));
           }
@@ -100,9 +99,9 @@ export default function Home() {
 
   return (
     <main className='min-h-screen bg-red-500 p-2'>
-      { pizzaOrder && <div className="w-full min-h-screen bg-no-repeat bg-cover bg-center bg-fixed bg-[url('../public/pizzeria.jpg')]">
+      {pizzaOrder && <div className="w-full min-h-screen bg-no-repeat bg-cover bg-center bg-fixed bg-[url('../public/pizzeria.jpg')]">
         <div className="w-full min-h-screen bg-no-repeat bg-cover bg-center bg-fixed bg-red-900 bg-opacity-60 pt-4">
-          {onChainOrderDetails ? 
+          {onChainOrderDetails ?
 
             <div className='bg-white shadow-md rounded-2xl border-solid border border-black mx-auto w-fit p-2'>
               <div className='text-center px-3 pb-6 pt-2'>
@@ -137,7 +136,11 @@ export default function Home() {
                 <p className='text-sm text-gray-700 mt-6 mx-auto'>
                   On-Chain Address :
                 </p>
-                <p className='text-sm mt-2 mx-auto'>{orderPublicKey?.toBase58()}</p>
+                <p className='text-sm mt-2 mx-auto'>
+                  <a
+                    className='underline text-blue-600'
+                    href={`https://explorer.solana.com/address/${orderPublicKey?.toBase58()}/anchor-account?cluster=devnet`}>{orderPublicKey?.toBase58()}</a>
+                </p>
               </div>
             </div>
             :
@@ -156,7 +159,7 @@ export default function Home() {
                     <li className='my-2 flex flex-row justify-left mx-10 text-lg'>
                       <p className='font-bold'>Pepperoni</p>
                       <p className='font-bold ml-auto text-red-600'>{pizzaOrder.pepperoni}</p>
-                      <button className='ml-6' onClick={() => addAddon({ ...pizzaOrder, pepperoni: pizzaOrder.pepperoni += 1})}><span>+</span></button>
+                      <button className='ml-6' onClick={() => addAddon({ ...pizzaOrder, pepperoni: pizzaOrder.pepperoni += 1 })}><span>+</span></button>
                       <button
                         className='ml-4 mr-4'
                         onClick={() => subtractPepperoni()}><span>-</span></button>
@@ -164,7 +167,7 @@ export default function Home() {
                     <li className='my-2 flex flex-row justify-left mx-10 text-lg'>
                       <p className='font-bold'>Mushrooms</p>
                       <p className='font-bold ml-auto text-red-600'>{pizzaOrder?.mushrooms}</p>
-                      <button className='ml-6' onClick={() => addAddon({ ...pizzaOrder, mushrooms: pizzaOrder.mushrooms += 1})}><span>+</span></button>
+                      <button className='ml-6' onClick={() => addAddon({ ...pizzaOrder, mushrooms: pizzaOrder.mushrooms += 1 })}><span>+</span></button>
                       <button
                         className='ml-4 mr-4'
                         onClick={() => subtractMushrooms()}><span>-</span></button>
@@ -172,7 +175,7 @@ export default function Home() {
                     <li className='my-2 flex flex-row justify-left mx-10 text-lg'>
                       <p className='font-bold'>Olives</p>
                       <p className='font-bold ml-auto text-red-600'>{pizzaOrder?.olives}</p>
-                      <button className='ml-6' onClick={() => addAddon({ ...pizzaOrder, olives: pizzaOrder.olives += 1})}><span>+</span></button>
+                      <button className='ml-6' onClick={() => addAddon({ ...pizzaOrder, olives: pizzaOrder.olives += 1 })}><span>+</span></button>
                       <button
                         className='ml-4 mr-4'
                         onClick={() => subtractOlives()}><span>-</span></button>
@@ -187,14 +190,14 @@ export default function Home() {
 
               {/* Pay QR */}
               {total != 0 && reference && orderNumber && pizzaOrder && (
-                <PayQR 
-                reference={reference} 
-                total={total}
-                order={orderNumber}
-                pepperoni={pizzaOrder.pepperoni}
-                mushrooms={pizzaOrder.mushrooms}
-                olives={pizzaOrder.olives}
-              />
+                <PayQR
+                  reference={reference}
+                  total={total}
+                  order={orderNumber}
+                  pepperoni={pizzaOrder.pepperoni}
+                  mushrooms={pizzaOrder.mushrooms}
+                  olives={pizzaOrder.olives}
+                />
               )}
             </div>
           }
