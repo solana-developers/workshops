@@ -2,6 +2,8 @@ import { bundlrStorage, Metaplex, toMetaplexFileFromBrowser, walletAdapterIdenti
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 
+const WORKSHOP_COLLECTION = new PublicKey("CPpyd2Uq1XkCkd9KHswjttdQXTvZ4mmrnif3tXg9i8sk");
+
 export async function loadAllOwnedNftsInCollection(
     connection: Connection,
     networkConfiguration: string, 
@@ -11,7 +13,7 @@ export async function loadAllOwnedNftsInCollection(
         .use(walletAdapterIdentity(wallet))
         .use(bundlrStorage({ address: `https://${networkConfiguration}.bundlr.network` }));
     const nfts = await metaplex.nfts().findAllByOwner({ owner: wallet.publicKey });
-    return nfts.filter((nft) => nft.collection.address === new PublicKey("CPpyd2Uq1XkCkd9KHswjttdQXTvZ4mmrnif3tXg9i8sk"))
+    return nfts.filter((nft) => nft.collection.address === WORKSHOP_COLLECTION)
 }
 
 export async function mintWithMetaplexJs(
@@ -33,12 +35,14 @@ export async function mintWithMetaplexJs(
         description: tokenDescription,
         image: await toMetaplexFileFromBrowser(image),
     });
-    const { mintAddress, response } = await metaplex.nfts().create({
+    const { nft, response } = await metaplex.nfts().create({
         name: tokenName,
+        symbol: tokenSymbol,
         uri: uri,
         sellerFeeBasisPoints: 0,
         tokenOwner: wallet.publicKey,
         mintTokens: true,
+        collection: WORKSHOP_COLLECTION,
     });
-    return [mintAddress.toBase58(), response.signature];
+    return [nft.address.toBase58(), response.signature];
 }

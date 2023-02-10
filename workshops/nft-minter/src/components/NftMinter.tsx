@@ -7,7 +7,7 @@ import { mintWithMetaplexJs } from "utils/metaplex";
 import { notify } from "utils/notifications";
 
 const TOKEN_NAME = "Solana Workshop NFT";
-const TOKEN_SYMBOL = "WKSHP";
+const TOKEN_SYMBOL = "SHOP";
 const TOKEN_DESCRIPTION = "NFT minted in the NFT Minter workshop!";
 
 export const NftMinter: FC = () => {
