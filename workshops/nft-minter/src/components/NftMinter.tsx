@@ -3,7 +3,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useNetworkConfiguration } from "contexts/NetworkConfigurationProvider";
 import Image from "next/image";
 import { FC, useCallback, useState } from "react";
-import { mintWithMetaplexJs, mintWithMplTokenMetadata } from "utils/minter";
+import { mintWithMetaplexJs } from "utils/metaplex";
 import { notify } from "utils/notifications";
 
 const TOKEN_NAME = "Solana Workshop NFT";
@@ -15,6 +15,7 @@ export const NftMinter: FC = () => {
     const { networkConfiguration } = useNetworkConfiguration();
     const wallet = useWallet();
 
+    const [image, setImage] = useState(null);
     const [createObjectURL, setCreateObjectURL] = useState(null);
 
     const [ mintAddress, setMintAddress ] = useState(null);
@@ -23,6 +24,7 @@ export const NftMinter: FC = () => {
     const uploadImage = async (event) => {
         if (event.target.files && event.target.files[0]) {
             const uploadedImage = event.target.files[0];
+            setImage(uploadedImage);
             setCreateObjectURL(URL.createObjectURL(uploadedImage));
             const body = new FormData();
             body.append("file", uploadedImage);
@@ -41,28 +43,20 @@ export const NftMinter: FC = () => {
             console.log('error', 'Wallet not connected!');
             notify({ type: 'error', message: 'error', description: 'Wallet not connected!' });
             return;
-        }
-        const [mintAddress, signature] = await mintWithMplTokenMetadata(
+        };
+        await mintWithMetaplexJs(
             connection,
             networkConfiguration,
             wallet,
             TOKEN_NAME,
             TOKEN_SYMBOL,
             TOKEN_DESCRIPTION,
-            createObjectURL,
-        );
-        // const [mintAddress, signature] = await mintWithMetaplexJs(
-        //     connection,
-        //     networkConfiguration,
-        //     wallet,
-        //     TOKEN_NAME,
-        //     TOKEN_SYMBOL,
-        //     TOKEN_DESCRIPTION,
-        //     createObjectURL,
-        // );
-        setMintAddress(mintAddress);
-        setMintSignature(signature);
-    }, [wallet, connection, networkConfiguration, createObjectURL]);
+            image,
+        ).then(([mintAddress, signature]) => {
+            setMintAddress(mintAddress)
+            setMintSignature(signature);
+        });
+    }, [wallet, connection, networkConfiguration, image]);
 
     return (
         <div>
