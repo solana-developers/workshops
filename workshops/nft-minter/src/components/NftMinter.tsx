@@ -1,4 +1,4 @@
-import { bundlrStorage, Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js";
+import { PublicKey } from "@metaplex-foundation/js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useNetworkConfiguration } from "contexts/NetworkConfigurationProvider";
 import Image from "next/image";
@@ -9,6 +9,7 @@ import { notify } from "utils/notifications";
 const TOKEN_NAME = "Solana Workshop NFT";
 const TOKEN_SYMBOL = "SHOP";
 const TOKEN_DESCRIPTION = "NFT minted in the NFT Minter workshop!";
+const WORKSHOP_COLLECTION = new PublicKey("CPpyd2Uq1XkCkd9KHswjttdQXTvZ4mmrnif3tXg9i8sk");
 
 export const NftMinter: FC = () => {
     const { connection } = useConnection();
@@ -51,6 +52,7 @@ export const NftMinter: FC = () => {
             TOKEN_NAME,
             TOKEN_SYMBOL,
             TOKEN_DESCRIPTION,
+            WORKSHOP_COLLECTION,
             image,
         ).then(([mintAddress, signature]) => {
             setMintAddress(mintAddress)
