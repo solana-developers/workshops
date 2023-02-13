@@ -73,7 +73,6 @@ export default function Home() {
                 </p>
 
                 <h2 className='mt-8 text-2xl'>
-
                   {
                     {
                       '0': "\\o/-------|-------ooo____________________",
@@ -120,9 +119,9 @@ export default function Home() {
               {currentPlayerPosition != null && gameDataState != null && (currentPlayerPosition <= 0 || currentPlayerPosition >= 20) && (
                 <PayQR instruction={"restart"} />
               )}
-
             </li>
           </div>
+          {CONNECTION._rpcEndpoint}
         </div>
       </div>}
     </main>
