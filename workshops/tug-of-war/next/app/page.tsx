@@ -111,7 +111,8 @@ export default function Home() {
                   size={360}
                 />
               )}
-              {currentPlayerPosition != null && gameDataState != null && (currentPlayerPosition <= 0 || currentPlayerPosition >= 20) && (
+
+              {reference && currentPlayerPosition != null && gameDataState != null && (currentPlayerPosition <= 0 || currentPlayerPosition >= 20) && (
                 <QRCode
                   instruction={"restart"}
                   address={reference}
