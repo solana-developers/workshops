@@ -121,8 +121,9 @@ export default function Home() {
               )}
             </li>
           </div>
-          {CONNECTION._rpcEndpoint}
+          
         </div>
+        {CONNECTION.rpcEndpoint}
       </div>}
     </main>
   );
