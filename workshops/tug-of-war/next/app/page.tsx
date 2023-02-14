@@ -48,14 +48,14 @@ export default function Home() {
   function UpdatePlayerDisplay() {
     counter++;
     counter = counter % 4;
-    if (counter == 1) {
-      setPlayerDisplay("Ooo-------|-------oOO");
+    if (counter == 0) {
+      setPlayerDisplay("ooO-------|-------Ooo");
+    } else if (counter == 1) {
+      setPlayerDisplay("oOo-------|-------oOo");
     } else if (counter == 2) {
-      setPlayerDisplay("ooO-------|-------oOo");
-    } else if (counter == 3) {
-      setPlayerDisplay("OoO-------|-------OOo");
+      setPlayerDisplay("Ooo-------|-------ooO");
     } else {
-      setPlayerDisplay("oOo-------|-------Ooo");
+      setPlayerDisplay("ooo-------|-------ooo");
     }
   }
 
