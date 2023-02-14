@@ -59,6 +59,22 @@ export default function Home() {
     }
   }
 
+  function GetRightPulls() {
+    if (currentPlayerPosition == undefined) {
+      return 0
+    } else {
+      return 10 - (currentPlayerPosition - 10)
+    }      
+  }
+  function GetLeftPulls() {
+    if (currentPlayerPosition == undefined) {
+      return 0
+    } else {
+      return 10 + (currentPlayerPosition - 10)
+    }       
+  }
+
+
   return (
     <main className='min-h-screen bg-blue-500 p-2'>
       {<div className="w-full min-h-screen bg-no-repeat bg-cover bg-center bg-fixed bg-[url('../public/bg.jpg')]">
@@ -78,29 +94,30 @@ export default function Home() {
                   {
                     {
                       '0': "\\o/-------|-------ooo____________________",
-                      '1': "_" + playerDisplay + "___________________",
-                      '2': "__" + playerDisplay + "__________________",
-                      '3': "___" + playerDisplay + "_________________",
-                      '4': "____" + playerDisplay + "________________",
-                      '5': "_____" + playerDisplay + "_______________",
-                      '6': "______" + playerDisplay + "______________",
-                      '7': "_______" + playerDisplay + "_____________",
-                      '8': "________" + playerDisplay + "____________",
-                      '9': "_________" + playerDisplay + "___________",
-                      '10': "__________" + playerDisplay + "__________",
-                      '11': "___________" + playerDisplay + "_________",
-                      '12': "____________" + playerDisplay + "________",
-                      '13': "_____________" + playerDisplay + "_______",
-                      '14': "______________" + playerDisplay + "______",
-                      '15': "_______________" + playerDisplay + "_____",
-                      '16': "________________" + playerDisplay + "____",
-                      '17': "_________________" + playerDisplay + "___",
-                      '18': "__________________" + playerDisplay + "__",
-                      '19': "___________________" + playerDisplay + "_",
-                      '20': "____________________ooo-------|-------\\o/",
+                      '1': GetLeftPulls()+"_" + playerDisplay + "___________________"+GetRightPulls(),
+                      '2': GetLeftPulls()+"__" + playerDisplay + "__________________"+GetRightPulls(),
+                      '3': GetLeftPulls()+"___" + playerDisplay + "_________________"+GetRightPulls(),
+                      '4': GetLeftPulls()+"____" + playerDisplay + "________________"+GetRightPulls(),
+                      '5': GetLeftPulls()+"_____" + playerDisplay + "_______________"+GetRightPulls(),
+                      '6': GetLeftPulls()+"______" + playerDisplay + "______________"+GetRightPulls(),
+                      '7': GetLeftPulls()+"_______" + playerDisplay + "_____________"+GetRightPulls(),
+                      '8': GetLeftPulls()+"________" + playerDisplay + "____________"+GetRightPulls(),
+                      '9': GetLeftPulls()+"_________" + playerDisplay + "___________"+GetRightPulls(),
+                      '10': GetLeftPulls()+"__________" + playerDisplay + "__________"+GetRightPulls(),
+                      '11': GetLeftPulls()+"___________" + playerDisplay + "_________"+GetRightPulls(),
+                      '12': GetLeftPulls()+"____________" + playerDisplay + "________"+GetRightPulls(),
+                      '13': GetLeftPulls()+"_____________" + playerDisplay + "_______"+GetRightPulls(),
+                      '14': GetLeftPulls()+"______________" + playerDisplay + "______"+GetRightPulls(),
+                      '15': GetLeftPulls()+"_______________" + playerDisplay + "_____"+GetRightPulls(),
+                      '16': GetLeftPulls()+"________________" + playerDisplay + "____"+GetRightPulls(),
+                      '17': GetLeftPulls()+"_________________" + playerDisplay + "___"+GetRightPulls(),
+                      '18': GetLeftPulls()+"__________________" + playerDisplay + "__"+GetRightPulls(),
+                      '19': GetLeftPulls()+"___________________" + playerDisplay + "_"+GetRightPulls(),
+                      '20': GetLeftPulls()+"____________________ooo-------|-------\\o/",
                     }[gameDataState ? gameDataState.playerPosition : 10]
                   }
                 </h2>
+
               </div>
             </div>
 
@@ -122,10 +139,8 @@ export default function Home() {
                 <PayQR instruction={"restart"} />
               )}
             </li>
-          </div>
-          
-        </div>
-        {CONNECTION.rpcEndpoint}
+          </div>          
+        </div>       
       </div>}
     </main>
   );

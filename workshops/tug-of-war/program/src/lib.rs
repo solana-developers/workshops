@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("6yr31Dq6uQFRG6F3nuZszaykAoyf1iqWJLiSZL75C4Pf");
+declare_id!("tugLiwCj74Nb5uNqtVgtoQ3x95Jhctz2RDRdLwmG9dF");
 
 #[program]
 pub mod tug_of_war {
