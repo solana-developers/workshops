@@ -69,10 +69,12 @@ export default function Home() {
             <div className='bg-white shadow-md rounded-2xl border-solid border border-black mx-auto w-fit p-2 mb-2'>
               <div className='text-center px-3 pb-6 pt-2'>
                 <p className='text-sm text-gray-700 my-4'>
-                  Tug Of War Game
+                  Tug Of War
+                  <br></br>
+                  Scan the Solana Pay Qr Code to pull left or right.
                 </p>
 
-                <h2 className='mt-8 text-2xl'>
+                <h2 className='mt-8 text-4xl'>
                   {
                     {
                       '0': "\\o/-------|-------ooo____________________",
