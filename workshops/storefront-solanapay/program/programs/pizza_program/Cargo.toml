@@ -1,0 +1,21 @@
+[package]
+name = "pizza_program"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "pizza_program"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.26.0"
+anchor-spl = "0.26.0"
+pyth-sdk-solana = { version = "0.7.0", optional = true }
