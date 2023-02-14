@@ -1,7 +1,7 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 
-export const CONNECTION = new Connection(process.env.RPC ? process.env.RPC : 'https://api.devnet.solana.com',  {
-    wsEndpoint: process.env.WSS_RPC ? process.env.WSS_RPC : "wss://api.devnet.solana.com",
+export const CONNECTION = new Connection(process.env.NEXT_PUBLIC_DEVNET_RPC ? process.env.NEXT_PUBLIC_DEVNET_RPC : 'https://api.devnet.solana.com',  {
+    wsEndpoint: process.env.NEXT_PUBLIC_DEVNET_WSS_RPC ? process.env.NEXT_PUBLIC_DEVNET_WSS_RPC : "wss://api.devnet.solana.com",
     commitment: 'confirmed' 
   });
 
