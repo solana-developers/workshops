@@ -10,7 +10,7 @@ use instructions::*;
 declare_id!("D8uy8ZP5i994D1mCvs61DUJLFa51RK45YMPrcoNrB4E2");
 
 const SOL_USD_PRICE_FEED_ID: &str = "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix";
-const USDC_MINT: &str = "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix";
+const USDC_MINT: &str = "Awy3qcokrpKMH7ustbAnfibhSehVtnmWhAFiVrimV157";
 
 #[program]
 mod token_lender {

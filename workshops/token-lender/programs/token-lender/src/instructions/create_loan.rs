@@ -19,7 +19,7 @@ pub fn create_loan(
     expiry_timestamp: u64,
 ) -> Result<()> {
 
-    // Set up the data for the new loan
+    msg!("Set up the data for the new loan");
     ctx.accounts.loan_escrow.set_inner(
         LoanEscrow {
             lender: ctx.accounts.lender.key(),
@@ -31,7 +31,7 @@ pub fn create_loan(
         }
     );
 
-    // Fund the loan with USDC
+    msg!("Fund the loan with USDC");
     transfer_token(
         ctx.accounts.token_program.to_account_info(), 
         ctx.accounts.lender.to_account_info(), 
@@ -40,7 +40,7 @@ pub fn create_loan(
         deposit,
     )?;
 
-    // Record the loan's ID in the lender's book
+    msg!("Record the loan's ID in the lender's book");
     ctx.accounts.lender_loan_book.set_inner(
         LenderLoanBook { 
             loan_count: loan_id, 
@@ -75,22 +75,19 @@ pub struct CreateLoan<'info> {
     )]
     pub loan_escrow: Account<'info, LoanEscrow>,
     #[account(
-        init_if_needed,
+        init,
         payer = lender,
         associated_token::mint = usdc_mint,
         associated_token::authority = loan_escrow,
     )]
     pub loan_escrow_usdc_ata: Account<'info, token::TokenAccount>,
 
-    #[account(
-        mut,
-        address = loan_escrow.lender,
-    )]
-    pub lender: SystemAccount<'info>,
+    #[account(mut)]
+    pub lender: Signer<'info>,
     #[account(
         mut,
         associated_token::mint = usdc_mint,
-        associated_token::authority = loan_escrow,
+        associated_token::authority = lender,
     )]
     pub lender_usdc_ata: Account<'info, token::TokenAccount>,
 

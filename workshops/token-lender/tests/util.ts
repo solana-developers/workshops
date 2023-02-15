@@ -7,7 +7,7 @@ import { Keypair, PublicKey } from "@solana/web3.js";
 import { assert } from "chai";
 
 export const SOL_USD_PRICE_FEED_ID = new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix");
-export const USDC_MINT = new PublicKey("J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix");
+export const USDC_MINT = new PublicKey("Awy3qcokrpKMH7ustbAnfibhSehVtnmWhAFiVrimV157");
 
 export const LOAN_BOOK_SEED_PREFIX = "loan_book";
 export const LOAN_ESCROW_SEED_PREFIX = "loan_escrow";
