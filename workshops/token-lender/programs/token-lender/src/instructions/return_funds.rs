@@ -6,14 +6,13 @@ use anchor_lang::prelude::*;
 use anchor_spl::token;
 
 use crate::state::LoanEscrow;
-use crate::util::{ Seeds, ToPubkey };
 use crate::USDC_MINT;
 
-use super::transfer_token;
+use super::{ ToPubkey, transfer_token };
 
 pub fn return_funds(
     ctx: Context<ReturnFunds>,
-    _loan_id: u32,
+    _loan_id: u8,
     amount: u64,
 ) -> Result<()> {
 
@@ -38,7 +37,7 @@ pub fn return_funds(
 
 #[derive(Accounts)]
 #[instruction(
-    loan_id: u32,
+    loan_id: u8,
     amount: u64,
 )]
 pub struct ReturnFunds<'info> {
@@ -52,8 +51,8 @@ pub struct ReturnFunds<'info> {
     #[account(
         mut,
         seeds = [
-            &LoanEscrow::SEED_PREFIX.to_seed(),
-            &loan_id.to_seed(),
+            LoanEscrow::SEED_PREFIX.as_bytes().as_ref(),
+            loan_id.to_le_bytes().as_ref(),
         ],
         bump = loan_escrow.bump,
     )]

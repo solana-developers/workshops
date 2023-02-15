@@ -17,16 +17,26 @@ use anchor_lang::solana_program::{
     system_instruction,
 };
 use anchor_spl::token;
+use std::str::FromStr;
 
 use crate::state::LoanEscrow;
-use crate::util::Seeds;
+
+pub trait ToPubkey {
+    fn to_pubkey(&self) -> Pubkey;
+}
+
+impl ToPubkey for &str {
+    fn to_pubkey(&self) -> Pubkey {
+        Pubkey::from_str(&self).expect("Error parsing public key from string.")
+    }
+}
 
 fn burn_signed<'a>(
     token_program: AccountInfo<'a>,
     mint: AccountInfo<'a>,
     from: AccountInfo<'a>,
     authority: AccountInfo<'a>,
-    loan_id: u32,
+    loan_id: u8,
     loan_escrow_bump: u8,
     amount: u64,
 ) -> Result<()> {
@@ -39,8 +49,8 @@ fn burn_signed<'a>(
                 authority,
             },
             &[&[
-                &LoanEscrow::SEED_PREFIX.to_seed(),
-                &loan_id.to_seed(),
+                LoanEscrow::SEED_PREFIX.as_bytes().as_ref(),
+                loan_id.to_le_bytes().as_ref(),
                 &[loan_escrow_bump]
             ]],
         ),
@@ -91,7 +101,7 @@ fn transfer_token_signed<'a>(
     loan_escrow: AccountInfo<'a>,
     from: AccountInfo<'a>,
     to: AccountInfo<'a>,
-    loan_id: u32,
+    loan_id: u8,
     loan_escrow_bump: u8,
     loan_amount: u64,
 ) -> Result<()> {
@@ -104,8 +114,8 @@ fn transfer_token_signed<'a>(
                 authority: loan_escrow,
             },
             &[&[
-                &LoanEscrow::SEED_PREFIX.to_seed(),
-                &loan_id.to_seed(),
+                LoanEscrow::SEED_PREFIX.as_bytes().as_ref(),
+                loan_id.to_le_bytes().as_ref(),
                 &[loan_escrow_bump]
             ]],
         ),

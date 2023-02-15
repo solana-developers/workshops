@@ -8,13 +8,12 @@ use anchor_spl::{ associated_token, token };
 
 use crate::USDC_MINT;
 use crate::state::LoanEscrow;
-use crate::util::{ Seeds, ToPubkey };
 
-use super::{ burn_signed, transfer_token };
+use super::{ ToPubkey, burn_signed, transfer_token };
 
 pub fn close_returned(
     ctx: Context<CloseReturned>,
-    loan_id: u32,
+    loan_id: u8,
 ) -> Result<()> {
 
     let loan_escrow_bump = *ctx.bumps.get(LoanEscrow::SEED_PREFIX).unwrap();
@@ -58,7 +57,7 @@ pub fn close_returned(
 }
 
 #[derive(Accounts)]
-#[instruction(loan_id: u32)]
+#[instruction(loan_id: u8)]
 pub struct CloseReturned<'info> {
 
     #[account(
@@ -77,8 +76,8 @@ pub struct CloseReturned<'info> {
     #[account(
         mut,
         seeds = [
-            &LoanEscrow::SEED_PREFIX.to_seed(),
-            &loan_id.to_seed(),
+            LoanEscrow::SEED_PREFIX.as_bytes().as_ref(),
+            loan_id.to_le_bytes().as_ref(),
         ],
         bump = loan_escrow.bump,
     )]

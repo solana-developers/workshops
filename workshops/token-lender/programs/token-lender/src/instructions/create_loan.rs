@@ -7,19 +7,18 @@ use anchor_lang::prelude::*;
 use anchor_spl::{ associated_token, token };
  
 use crate::USDC_MINT;
-use crate::state::{ LenderLoanBook, LoanEscrow };
-use crate::util::{ Seeds, ToPubkey };
+use crate::state::LoanEscrow;
 
-use super::transfer_token;
+use super::{ ToPubkey, transfer_token };
 
 pub fn create_loan(
     ctx: Context<CreateLoan>,
-    loan_id: u32,
+    loan_id: u8,
     deposit: u64,
     expiry_timestamp: u64,
 ) -> Result<()> {
 
-    msg!("Set up the data for the new loan");
+    // Set up the data for the new loan
     ctx.accounts.loan_escrow.set_inner(
         LoanEscrow {
             lender: ctx.accounts.lender.key(),
@@ -31,7 +30,7 @@ pub fn create_loan(
         }
     );
 
-    msg!("Fund the loan with USDC");
+    // Fund the loan with USDC
     transfer_token(
         ctx.accounts.token_program.to_account_info(), 
         ctx.accounts.lender.to_account_info(), 
@@ -40,20 +39,12 @@ pub fn create_loan(
         deposit,
     )?;
 
-    msg!("Record the loan's ID in the lender's book");
-    ctx.accounts.lender_loan_book.set_inner(
-        LenderLoanBook { 
-            loan_count: loan_id, 
-            ..ctx.accounts.lender_loan_book.clone().into_inner()
-        }
-    );
-
     Ok(())
 }
 
 #[derive(Accounts)]
 #[instruction(
-    loan_id: u32
+    loan_id: u8
 )]
 pub struct CreateLoan<'info> {
     
@@ -68,8 +59,8 @@ pub struct CreateLoan<'info> {
         payer = lender,
         space = 8 + 32 + 1 + 32 + 8 + 8 + 1,
         seeds = [
-            &LoanEscrow::SEED_PREFIX.to_seed(),
-            &loan_id.to_seed(),
+            LoanEscrow::SEED_PREFIX.as_bytes().as_ref(),
+            loan_id.to_le_bytes().as_ref(),
         ],
         bump,
     )]
@@ -90,18 +81,6 @@ pub struct CreateLoan<'info> {
         associated_token::authority = lender,
     )]
     pub lender_usdc_ata: Account<'info, token::TokenAccount>,
-
-    #[account(
-        init_if_needed,
-        payer = lender,
-        space = 8 + 32 + 4 + 1,
-        seeds = [
-            &LenderLoanBook::SEED_PREFIX.to_seed(),
-            lender.key().as_ref(),
-        ],
-        bump,
-    )]
-    pub lender_loan_book: Account<'info, LenderLoanBook>,
 
     pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,

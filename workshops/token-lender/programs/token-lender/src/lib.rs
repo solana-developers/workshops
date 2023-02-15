@@ -1,7 +1,6 @@
 mod error;
 mod instructions;
 mod state;
-mod util;
 
 use anchor_lang::prelude::*;
 
@@ -18,7 +17,7 @@ mod token_lender {
 
     pub fn create_loan(
         ctx: Context<CreateLoan>,
-        loan_id: u32,
+        loan_id: u8,
         deposit_usdc: u64,
         expiry_timestamp: u64,
     ) -> Result<()> {
@@ -27,14 +26,14 @@ mod token_lender {
 
     pub fn accept_loan(
         ctx: Context<AcceptLoan>,
-        loan_id: u32,
+        loan_id: u8,
     ) -> Result<()> {
         accept_loan::accept_loan(ctx, loan_id)
     }
 
     pub fn return_funds(
         ctx: Context<ReturnFunds>,
-        loan_id: u32,
+        loan_id: u8,
         amount: u64,
     ) -> Result<()> {
         return_funds::return_funds(ctx, loan_id, amount)
@@ -42,14 +41,14 @@ mod token_lender {
 
     pub fn close_expired(
         ctx: Context<CloseExpired>,
-        loan_id: u32,
+        loan_id: u8,
     ) -> Result<()> {
         close_expired::close_expired(ctx, loan_id)
     }
 
     pub fn close_returned(
         ctx: Context<CloseReturned>,
-        loan_id: u32,
+        loan_id: u8,
     ) -> Result<()> {
         close_returned::close_returned(ctx, loan_id)
     }

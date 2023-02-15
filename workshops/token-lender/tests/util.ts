@@ -22,17 +22,17 @@ export function getMetadataPublicKey(mint: PublicKey): [PublicKey, number] {
     return PublicKey.findProgramAddressSync(
         [
             Buffer.from("metadata"),
-            mint.toBuffer(),
             METADATA_PROGRAM_ID.toBuffer(),
+            mint.toBuffer(),
         ],
         METADATA_PROGRAM_ID,
     )
 }
 
-export function getLenderPublicKey(programId: PublicKey, lender: PublicKey): [PublicKey, number] {
+export function getLenderLoanBookPublicKey(programId: PublicKey, lender: PublicKey): [PublicKey, number] {
     return PublicKey.findProgramAddressSync(
         [
-            Buffer.from(LOAN_ESCROW_SEED_PREFIX),
+            Buffer.from(LOAN_BOOK_SEED_PREFIX),
             lender.toBuffer(),
         ],
         programId,
@@ -40,13 +40,15 @@ export function getLenderPublicKey(programId: PublicKey, lender: PublicKey): [Pu
 }
 
 export function getLoanEscrowPublicKey(programId: PublicKey, loanId: number): [PublicKey, number] {
-    return PublicKey.findProgramAddressSync(
+    const [key, bump] = PublicKey.findProgramAddressSync(
         [
             Buffer.from(LOAN_ESCROW_SEED_PREFIX),
-            Buffer.alloc(loanId), // TODO
+            Buffer.from(Uint8Array.of(loanId)),
         ],
         programId,
     )
+    console.log(`Key: ${key}`)
+    return [key, bump]
 }
 
 function printLoan(loan: anchor.IdlTypes<anchor.Idl>["LoanEscrow"], status: string) {
