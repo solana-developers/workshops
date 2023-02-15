@@ -5,7 +5,9 @@
         "upload-json": "ts-node scripts/upload-json.ts"
     },
     "dependencies": {
-        "@project-serum/anchor": "^0.24.2"
+        "@metaplex-foundation/mpl-token-metadata": "^2.8.3",
+        "@project-serum/anchor": "^0.24.2",
+        "@solana/spl-token": "^0.3.7"
     },
     "devDependencies": {
         "@metaplex-foundation/js": "^0.18.0",

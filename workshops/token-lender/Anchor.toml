@@ -1,13 +1,13 @@
 [features]
 seeds = false
 [programs.localnet]
-token_lender = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+token_lender = "D8uy8ZP5i994D1mCvs61DUJLFa51RK45YMPrcoNrB4E2"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/Users/joesol/.config/solana/id.json"
 
 [scripts]
