@@ -1,13 +1,25 @@
 'use client'; // this makes next know that this page should be rendered in the client
 import { useEffect, useState } from 'react';
-import { CONNECTION } from '@/src/util/const';
+import { CONNECTION, TUG_OF_WAR_PROGRAM_ID } from '@/src/util/const';
 import { GameDataAccount, displayPlayerPosition, getGameDataAccountPublicKey } from '@/src/util/move';
 import PayQR from '@/src/components/PayQR';
+import { Wallet } from '@/src/Wallet';
+import {
+  WalletModalProvider,
+  WalletDisconnectButton,
+  WalletMultiButton
+} from '@solana/wallet-adapter-react-ui';
+import { Transaction, TransactionInstruction } from '@solana/web3.js';
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+var sha256 = require('sha256')
 
 export default function Home() {
   const [gameDataState, setGameDataState] = useState<GameDataAccount>()
   const [currentPlayerPosition, setCurrentPlayerPosition] = useState<number>();
   const [playerDisplay, setPlayerDisplay] = useState<string>();
+  const { connection } = useConnection();
+  const { publicKey, sendTransaction } = useWallet();
+
   let counter = 0;
 
   useEffect(() => {
@@ -72,6 +84,31 @@ export default function Home() {
     }       
   }
 
+  async function RestartGame() {
+
+    if (publicKey == undefined) {       
+      return;
+    }
+
+    const transaction = new Transaction();
+    const latestBlockhash = await CONNECTION.getLatestBlockhash();
+    transaction.feePayer = publicKey;
+    transaction.recentBlockhash = latestBlockhash.blockhash;
+    const anchorFunctionDescriminator = sha256("global:restart_game")
+
+      transaction.add(new TransactionInstruction({
+        keys: [
+            { pubkey: getGameDataAccountPublicKey(), isSigner: false, isWritable: true },
+            { pubkey: publicKey, isSigner: true, isWritable: true },
+        ],
+        programId: TUG_OF_WAR_PROGRAM_ID,
+        data: Buffer.from(anchorFunctionDescriminator.toString().substring(0, 16), "hex")
+    }));
+
+    const signature = await sendTransaction(transaction, connection);
+
+    await connection.confirmTransaction(signature, "processed");
+  }
 
   return (
     <main className='min-h-screen bg-blue-500 p-2'>
@@ -79,6 +116,18 @@ export default function Home() {
         <div className="w-full min-h-screen bg-no-repeat bg-cover bg-center bg-fixed bg-blue-900 bg-opacity-60 pt-4">
 
           <div className='flex flex-col justify-center'>
+
+          {/* If you want to have wallet connector and call functions from the web page as well this is how you can do it.  */
+          /*gameDataState && (
+            <>
+              <WalletMultiButton />
+              <WalletDisconnectButton />
+            </>
+          )
+            <button onClick={RestartGame} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Restart Game
+            </button>
+          */}
 
             <div className='bg-white shadow-md rounded-2xl border-solid border border-black mx-auto w-fit p-2 mb-2'>
               <div className='text-center px-3 pb-6 pt-2'>
