@@ -11,7 +11,7 @@
 
 ## Controling a game on a big screen using Solana Pay QR codes? How?!
 
-TODO: add screen shot
+<img width="1325" alt="image" src="https://user-images.githubusercontent.com/5938789/218829341-ac942433-cb12-4d97-8164-cb7dbfeffb3d.png">
 
 Solana Pay is usually used the request a vertain amount of tokens or Sol from someone via a Qr code. 
 But the transaction request can actually be used for any transaction that you can imagine. So what we build here in this workshop is an interface for a game using Solana Pay Qr codes. When the player scans one fo the codes with his phone his mobile wallet will open an he will be able to sign a transaction. 
