@@ -2,3 +2,5 @@
 /*/**/.DS_Store
 test-ledger/
 /*/**/test-ledger/
+.vercel
+workshops/tug-of-war/next/.env
