@@ -1,13 +1,13 @@
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL, TransactionSignature } from '@solana/web3.js';
 import { FC, useCallback } from 'react';
-import useUserSOLBalanceStore from '../stores/useUserSOLBalanceStore';
+import useUserUSDCBalanceStore from 'stores/useUserUSDCBalanceStore';
 import { notify } from '../utils/notifications';
 
-export const RequestAirdrop: FC = () => {
+export const RequestAirdropUsdc: FC = () => {
     const { connection } = useConnection();
     const { publicKey } = useWallet();
-    const { getUserSOLBalance } = useUserSOLBalanceStore();
+    const { getUserUSDCBalance } = useUserUSDCBalanceStore();
 
     const onClick = useCallback(async () => {
         if (!publicKey) {
@@ -41,7 +41,7 @@ export const RequestAirdrop: FC = () => {
                 txid: signature,
             });
 
-            getUserSOLBalance(publicKey, connection);
+            getUserUSDCBalance(publicKey, connection);
         } catch (error: any) {
             notify({
                 type: 'error',
@@ -55,17 +55,17 @@ export const RequestAirdrop: FC = () => {
                 signature,
             );
         }
-    }, [publicKey, connection, getUserSOLBalance]);
+    }, [publicKey, connection, getUserUSDCBalance]);
 
     return (
         <div className="flex flex-row justify-center">
             <div className="relative group items-center">
                 <div
-                    className="m-1 absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-fuchsia-500 
+                    className="m-1 absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 
                     rounded-lg blur opacity-20 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"
                 ></div>
                 <button
-                    className="px-8 m-2 btn animate-pulse bg-gradient-to-br from-indigo-500 to-fuchsia-500 hover:from-white hover:to-purple-300 text-black"
+                    className="px-8 m-2 btn animate-pulse bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-white hover:to-cyan-300 text-black"
                     onClick={onClick}
                 >
                     <span>Airdrop 1 </span>

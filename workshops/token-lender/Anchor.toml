@@ -1,7 +1,7 @@
 [features]
 seeds = false
 [programs.devnet]
-token_lender = "D8uy8ZP5i994D1mCvs61DUJLFa51RK45YMPrcoNrB4E2"
+token_lender = "32xQJkxLJNmWPtykFuBpdXrh7SxMpRwSkYUWY3Fa9cim"
 
 [registry]
 url = "https://anchor.projectserum.com"

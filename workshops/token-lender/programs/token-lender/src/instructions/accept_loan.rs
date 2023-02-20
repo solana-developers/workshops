@@ -2,41 +2,35 @@
  * Accepts an available loan by depositing a calculated amount
  *      of SOL collateral into the escrow.
  */
-
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::{
-    entrypoint::ProgramResult,
-    native_token::LAMPORTS_PER_SOL,
-    program::invoke_signed,
+    entrypoint::ProgramResult, native_token::LAMPORTS_PER_SOL, program::invoke_signed,
 };
 use anchor_spl::{associated_token, token};
 use mpl_token_metadata::instruction as mpl_instruction;
 use pyth_sdk_solana::load_price_feed_from_account_info;
 
-use crate::{ SOL_USD_PRICE_FEED_ID, USDC_MINT };
 use crate::error::ErrorCode;
 use crate::state::LoanEscrow;
+use crate::{SOL_USD_PRICE_FEED_ID, USDC_MINT};
 
-use super::{ ToPubkey, transfer_sol, transfer_token_signed };
+use super::{transfer_sol, transfer_token_signed, ToPubkey};
 
-pub fn accept_loan(
-    ctx: Context<AcceptLoan>,
-    loan_id: u8,
-) -> Result<()> {
+pub fn accept_loan(ctx: Context<AcceptLoan>, loan_id: u8) -> Result<()> {
+    msg!("Get SOL/USDC price conversion data");
+    let sol_usd_price_feed = load_price_feed_from_account_info(&ctx.accounts.pyth_account).unwrap();
+    let current_price = sol_usd_price_feed.get_price_unchecked();
 
-    // Get SOL/USDC price conversion data
-    // let sol_usd_price_feed = load_price_feed_from_account_info(&ctx.accounts.pyth_account).unwrap();
-    // let current_price = sol_usd_price_feed.get_price_unchecked();
-
-    // Calculate the required collateral
+    msg!("Calculate the required collateral");
     // let amount_in_lamports = ctx.accounts.loan_escrow.deposit
     //     * LAMPORTS_PER_SOL
     //     * 10u64.pow(u32::try_from(-current_price.expo).unwrap())
-    //     / (u64::try_from(current_price.price).unwrap());
-    let amount_in_lamports: u64 = 100000;
+    //     / (u64::try_from(current_price.price).unwrap()) as u64;
+    let amount_in_lamports = 100000;
 
     msg!("Take the borrower's SOL as collateral");
     transfer_sol(
+        ctx.accounts.system_program.to_account_info(),
         ctx.accounts.borrower.to_account_info(),
         ctx.accounts.loan_escrow.to_account_info(),
         amount_in_lamports,
@@ -50,7 +44,7 @@ pub fn accept_loan(
         ctx.accounts.loan_escrow.to_account_info(),
         ctx.accounts.borrower.to_account_info(),
         ctx.accounts.rent.to_account_info(),
-        loan_id, 
+        loan_id,
         ctx.accounts.loan_escrow.bump,
     )?;
 
@@ -67,21 +61,16 @@ pub fn accept_loan(
 
     msg!("Transfer the USDC loan out to the borrower");
     transfer_token_signed(
-        ctx.accounts.token_program.to_account_info(), 
-        ctx.accounts.loan_escrow.to_account_info(), 
-        ctx.accounts.loan_escrow_usdc_ata.to_account_info(), 
-        ctx.accounts.borrower_usdc_ata.to_account_info(), 
-        loan_id, 
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.loan_escrow.to_account_info(),
+        ctx.accounts.loan_escrow_usdc_ata.to_account_info(),
+        ctx.accounts.borrower_usdc_ata.to_account_info(),
+        loan_id,
         ctx.accounts.loan_escrow.bump,
-        ctx.accounts.loan_escrow.deposit,
+        ctx.accounts.loan_escrow_usdc_ata.amount,
     )?;
-    
-    ctx.accounts.loan_escrow.set_inner(
-        LoanEscrow { 
-            borrower: Some(ctx.accounts.borrower.key()), 
-            ..ctx.accounts.loan_escrow.clone().into_inner()
-        }
-    );
+
+    ctx.accounts.loan_escrow.borrower = ctx.accounts.borrower.key();
 
     Ok(())
 }
@@ -89,16 +78,20 @@ pub fn accept_loan(
 #[derive(Accounts)]
 #[instruction(loan_id: u8)]
 pub struct AcceptLoan<'info> {
-
     #[account(
         mint::decimals = 6,
         address = USDC_MINT.to_pubkey(),
     )]
     pub usdc_mint: Box<Account<'info, token::Mint>>,
-    
+
     #[account(
         init,
         payer = borrower,
+        seeds = [
+            b"loan_note_mint",
+            loan_escrow.key().as_ref(),
+        ],
+        bump,
         mint::decimals = 6,
         mint::authority = loan_escrow,
     )]
@@ -132,7 +125,7 @@ pub struct AcceptLoan<'info> {
         associated_token::authority = borrower,
     )]
     pub borrower_usdc_ata: Box<Account<'info, token::TokenAccount>>,
-    
+
     #[account(
         mut,
         address = loan_escrow.lender,
@@ -145,13 +138,13 @@ pub struct AcceptLoan<'info> {
         associated_token::authority = lender,
     )]
     pub lender_loan_note_mint_ata: Box<Account<'info, token::TokenAccount>>,
-    
+
     /// CHECK: Pyth will check this
-    // #[account(
-    //     address = SOL_USD_PRICE_FEED_ID.to_pubkey()
-    //         @ ErrorCode::InvalidArgument
-    // )]
-    // pub pyth_account: UncheckedAccount<'info>,
+    #[account(
+        address = SOL_USD_PRICE_FEED_ID.to_pubkey()
+            @ ErrorCode::InvalidArgument
+    )]
+    pub pyth_account: UncheckedAccount<'info>,
 
     pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
@@ -198,10 +191,10 @@ fn create_receipt_token_metadata<'a>(
             rent,
         ],
         &[&[
-                LoanEscrow::SEED_PREFIX.as_bytes().as_ref(),
-                loan_id.to_le_bytes().as_ref(),
-                &[loan_escrow_bump]
-            ]],
+            LoanEscrow::SEED_PREFIX.as_bytes().as_ref(),
+            loan_id.to_le_bytes().as_ref(),
+            &[loan_escrow_bump],
+        ]],
     )
 }
 
@@ -225,7 +218,7 @@ fn mint_receipt_tokens_to_lender<'a>(
             &[&[
                 LoanEscrow::SEED_PREFIX.as_bytes().as_ref(),
                 loan_id.to_le_bytes().as_ref(),
-                &[loan_escrow_bump]
+                &[loan_escrow_bump],
             ]],
         ),
         deposit,

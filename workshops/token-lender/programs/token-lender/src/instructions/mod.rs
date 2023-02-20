@@ -11,11 +11,7 @@ pub use create_loan::*;
 pub use return_funds::*;
 
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::{
-    entrypoint::ProgramResult,
-    program::invoke,
-    system_instruction,
-};
+use anchor_lang::system_program;
 use anchor_spl::token;
 use std::str::FromStr;
 
@@ -51,7 +47,7 @@ fn burn_signed<'a>(
             &[&[
                 LoanEscrow::SEED_PREFIX.as_bytes().as_ref(),
                 loan_id.to_le_bytes().as_ref(),
-                &[loan_escrow_bump]
+                &[loan_escrow_bump],
             ]],
         ),
         amount,
@@ -59,20 +55,14 @@ fn burn_signed<'a>(
 }
 
 fn transfer_sol<'a>(
+    system_program: AccountInfo<'a>,
     from: AccountInfo<'a>,
     to: AccountInfo<'a>,
     amount: u64,
-) -> ProgramResult {
-    invoke(
-        &system_instruction::transfer(
-            &from.key,
-            &to.key,
-            amount,
-        ),
-        &[
-            from,
-            to,
-        ],
+) -> Result<()> {
+    system_program::transfer(
+        CpiContext::new(system_program, system_program::Transfer { from, to }),
+        amount,
     )
 }
 
@@ -116,7 +106,7 @@ fn transfer_token_signed<'a>(
             &[&[
                 LoanEscrow::SEED_PREFIX.as_bytes().as_ref(),
                 loan_id.to_le_bytes().as_ref(),
-                &[loan_escrow_bump]
+                &[loan_escrow_bump],
             ]],
         ),
         loan_amount,

@@ -2,59 +2,62 @@
  * Liquidates all SOL collateral & any USDC from the escrow to the lender
  *      if the loan has expired.
  */
-
 use anchor_lang::{prelude::*, AccountsClose};
-use anchor_spl::{ associated_token, token };
+use anchor_spl::{associated_token, token};
 
-use crate::USDC_MINT;
 use crate::state::LoanEscrow;
+use crate::USDC_MINT;
 
-use super::{ ToPubkey, burn_signed, transfer_token };
+use super::{burn_signed, transfer_token, transfer_token_signed, ToPubkey};
 
-pub fn close_expired(
-    ctx: Context<CloseExpired>,
-    loan_id: u8,
-) -> Result<()> {
+pub fn close_expired(ctx: Context<CloseExpired>, loan_id: u8) -> Result<()> {
+    let loan_escrow_bump = ctx.accounts.loan_escrow.bump;
 
-    let loan_escrow_bump = *ctx.bumps.get(LoanEscrow::SEED_PREFIX).unwrap();
-
-    // Check to make sure the loan is expired
+    msg!("Check to make sure the loan is expired");
     assert!(loan_is_expired(
         &ctx.accounts.clock,
         &ctx.accounts.loan_escrow,
     ));
 
-    // Collect receipt tokens from the lender
+    msg!("Collect receipt tokens from the lender");
     transfer_token(
-        ctx.accounts.token_program.to_account_info(), 
-        ctx.accounts.lender.to_account_info(), 
-        ctx.accounts.lender_loan_note_mint_ata.to_account_info(), 
-        ctx.accounts.loan_escrow.to_account_info(), 
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.lender.to_account_info(),
+        ctx.accounts.lender_loan_note_mint_ata.to_account_info(),
+        ctx.accounts
+            .loan_escrow_loan_note_mint_ata
+            .to_account_info(),
         ctx.accounts.loan_escrow.deposit,
     )?;
 
-    // Burn the receipt token
+    msg!("Return the USDC loan to the lender");
+    transfer_token_signed(
+        ctx.accounts.token_program.to_account_info(),
+        ctx.accounts.loan_escrow.to_account_info(),
+        ctx.accounts.loan_escrow_usdc_ata.to_account_info(),
+        ctx.accounts.lender_usdc_ata.to_account_info(),
+        loan_id,
+        ctx.accounts.loan_escrow.bump,
+        ctx.accounts.loan_escrow_usdc_ata.amount,
+    )?;
+
+    msg!("Burn the receipt token");
     burn_signed(
         ctx.accounts.token_program.to_account_info(),
         ctx.accounts.loan_note_mint.to_account_info(),
-        ctx.accounts.loan_escrow_loan_note_mint_ata.to_account_info(),
+        ctx.accounts
+            .loan_escrow_loan_note_mint_ata
+            .to_account_info(),
         ctx.accounts.loan_escrow.to_account_info(),
         loan_id,
         loan_escrow_bump,
         ctx.accounts.loan_escrow.deposit,
     )?;
 
-    // Return any USDC in the loan escrow
-    transfer_token(
-        ctx.accounts.token_program.to_account_info(), 
-        ctx.accounts.loan_escrow.to_account_info(), 
-        ctx.accounts.loan_escrow_usdc_ata.to_account_info(), 
-        ctx.accounts.lender_usdc_ata.to_account_info(), 
-        ctx.accounts.loan_escrow.deposit,
-    )?;
-
-    // Close the loan & liquidate the collateral to the lender
-    ctx.accounts.loan_escrow.close(ctx.accounts.lender.to_account_info())?;
+    msg!("Close the loan & liquidate the collateral to the lender");
+    ctx.accounts
+        .loan_escrow
+        .close(ctx.accounts.lender.to_account_info())?;
 
     Ok(())
 }
@@ -64,19 +67,18 @@ pub fn close_expired(
     loan_id: u8
 )]
 pub struct CloseExpired<'info> {
-
     #[account(
         mint::decimals = 6,
         address = USDC_MINT.to_pubkey(),
     )]
-    pub usdc_mint: Account<'info, token::Mint>,
+    pub usdc_mint: Box<Account<'info, token::Mint>>,
 
     #[account(
         mut,
         mint::decimals = 6,
         mint::authority = loan_escrow,
     )]
-    pub loan_note_mint: Account<'info, token::Mint>,
+    pub loan_note_mint: Box<Account<'info, token::Mint>>,
 
     #[account(
         mut,
@@ -93,14 +95,14 @@ pub struct CloseExpired<'info> {
         associated_token::mint = loan_note_mint,
         associated_token::authority = loan_escrow,
     )]
-    pub loan_escrow_loan_note_mint_ata: Account<'info, token::TokenAccount>,
+    pub loan_escrow_loan_note_mint_ata: Box<Account<'info, token::TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = usdc_mint,
         associated_token::authority = loan_escrow,
     )]
-    pub loan_escrow_usdc_ata: Account<'info, token::TokenAccount>,
+    pub loan_escrow_usdc_ata: Box<Account<'info, token::TokenAccount>>,
 
     #[account(
         mut,
@@ -112,13 +114,13 @@ pub struct CloseExpired<'info> {
         associated_token::mint = loan_note_mint,
         associated_token::authority = lender,
     )]
-    pub lender_loan_note_mint_ata: Account<'info, token::TokenAccount>,
+    pub lender_loan_note_mint_ata: Box<Account<'info, token::TokenAccount>>,
     #[account(
         mut,
         associated_token::mint = usdc_mint,
-        associated_token::authority = loan_escrow,
+        associated_token::authority = lender,
     )]
-    pub lender_usdc_ata: Account<'info, token::TokenAccount>,
+    pub lender_usdc_ata: Box<Account<'info, token::TokenAccount>>,
 
     pub clock: Sysvar<'info, Clock>,
 
@@ -128,9 +130,6 @@ pub struct CloseExpired<'info> {
     pub associated_token_program: Program<'info, associated_token::AssociatedToken>,
 }
 
-fn loan_is_expired<'a>(
-    clock: &Sysvar<'a, Clock>,
-    loan_escrow: &Account<'a, LoanEscrow>,
-) -> bool {
+fn loan_is_expired<'a>(clock: &Sysvar<'a, Clock>, loan_escrow: &Account<'a, LoanEscrow>) -> bool {
     clock.slot > loan_escrow.expiry_timestamp
 }

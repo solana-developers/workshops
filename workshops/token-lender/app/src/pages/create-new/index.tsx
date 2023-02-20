@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { HomeView } from '../views';
+import { CreateNewView } from 'views/create-new';
 
 const Home: NextPage = props => {
     return (
@@ -9,7 +9,7 @@ const Home: NextPage = props => {
                 <title>Token Lender</title>
                 <meta name="description" content="Token Lender" />
             </Head>
-            <HomeView />
+            <CreateNewView />
         </div>
     );
 };
